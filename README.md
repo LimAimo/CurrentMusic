@@ -2,8 +2,24 @@
 
 基于网易云音乐 SVIP 自建音源自建账号体系的 Android 音乐应用。MDUI 2（Material Design 3）设计语言。
 
-![version](https://img.shields.io/badge/version-1.22.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
+![version](https://img.shields.io/badge/version-1.22.1-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
 
+> **v1.22.1**：**紧急修复——v1.22.0 上线后所有歌曲都无法播放**（P0 事故）。
+> 根因不在音源链路（后端三档解析、CDN 直链实测全部正常），而在前端：
+> `player.js` 调用了 `songurl.js` 导出的 `resolveSongUrl`，却**漏了这一行 import**。
+> esbuild 不报错（未声明的标识符被当成全局变量引用），构建与 CI 全绿；
+> 但打包时 songurl.js 因为「没人 import 它」整块没进包，一进浏览器就是
+> `ReferenceError: resolveSongUrl is not defined` → 点播放即失败 → 连跳下一首 → 全站无法播放。
+> · **修复**：补上 import；并新增 `tools/check-js-refs.py`——专查「某模块导出的名字被
+>   别的文件用到、却没有 import」，已接入 CI 前端构建任务（这类错误 esbuild 查不出，
+>   只能靠它守）。
+> · **顺带修掉两个网关缺陷**（同日发现）：
+>   ① 网关每个请求写出 200 响应后，因 `jresp()` 无返回值又被当成「未登记」补写一个 404
+>      ——日志里每请求两行 + 大量 BrokenPipe；现已显式返回，一请求一行、无幽灵 404。
+>   ② 网关取音源地址返回的是 `http://` 直链，HTTPS 页面加载会被浏览器当**混合内容**拦死；
+>      同时没把调用方 IP 传给上游。现按 `/song/url/v1` 文档补 `realIP`（服务端取真实 IP，
+>      不可伪造），并把 126.net 直链统一升为 https。
+> · 验证：网关冒烟与契约测试全绿、覆盖率不变（420/440 = 95.5%）。
 > **v1.22.0**：**接入网易云接口五阶段计划——上游 440 条路由里 420 条（95.5%）有了项目内可达入口**。
 > 这一版不是加几个接口，而是把「上游能力」变成「产品能力」：新增**登记式封装层**（`cm_ncm_registry.py` 421 条登记、
 > 四级安全分级 T0 公开只读 / T1 账号只读 / T2 账号写 / T3 敏感专用入口），按接口族熔断、分类 TTL 缓存、
