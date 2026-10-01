@@ -192,7 +192,7 @@ mdui-dialog.cm-adaptive-dialog :is([slot="action"], [slot="actions"]) { flex-shr
 mdui-dialog.cm-adaptive-dialog { --cm-dialog-viewport: var(--cm-vvh, 100dvh); }
 mdui-dialog.cm-adaptive-dialog::part(panel) {
   max-width: calc(100vw - 16px); max-height: calc(var(--cm-dialog-viewport) - 20px - env(safe-area-inset-bottom));
-  overflow: hidden; contain: layout; 
+  overflow: hidden; contain: layout;
 }
 mdui-dialog.cm-adaptive-dialog .cm-dialog-scroll {
   box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0;

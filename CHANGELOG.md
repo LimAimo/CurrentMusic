@@ -3,6 +3,8 @@
 CurrentMusic 的完整版本历史（最新在上）。每个版本都对应一次 APK 发版，
 下载见 [Releases](https://github.com/backrooms-yrc/CurrentMusic/releases)。
 
+**MD3E 原生交互优化（Fork 开发分支）**：模态框仅渐隐渐显、28dp 纯色容器、手机长正文底部适配；胶囊式分段状态及约 160ms 按压反馈；贴边迷你播放器、收紧操作间距、歌词摘录启动提示；高 DPI 清晰频谱及开关、播放时流动且暂停时变直线的像素级波浪进度；顶栏按内容穿越进行透明磨砂过渡；52–56dp 紧凑扁平设置与玻璃专属选项隔离。已有文档更新，不另建说明文档。
+
 ---
 
 **开发中 · Material 3 Expressive / Web 体验修订（暂不作为 APK 正式发版）**

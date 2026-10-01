@@ -223,8 +223,8 @@ html[data-cm-wave-off] .pl-seekbar .cm-wavy-track { display: none !important; }
   --cm-header-clear: 0%; --cm-header-border: 0%; --cm-scroll-amount: 0;
   background: color-mix(in srgb, var(--cm-e-bg) calc(100% - var(--cm-header-clear)), transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--cm-e-outline) var(--cm-header-border), transparent);
-  box-shadow: none; backdrop-filter: blur(calc(var(--cm-scroll-amount) * 14px));
-  -webkit-backdrop-filter: blur(calc(var(--cm-scroll-amount) * 14px));
+  box-shadow: none; backdrop-filter: blur(var(--cm-header-blur, 0px));
+  -webkit-backdrop-filter: blur(var(--cm-header-blur, 0px));
 }
 /* 扁平设置：去掉大容器、夸张行间距及多余侧边留白。 */
 :root:not([data-ui-preset]) .cm-setting-list {
@@ -250,4 +250,14 @@ html[data-cm-wave-off] .pl-seekbar .cm-wavy-track { display: none !important; }
 @media (max-width: 600px) {
  :root:not([data-ui-preset]) .cm-setting-list { margin-inline: 0; }
  :root:not([data-ui-preset]) .cm-setting { gap: 9px; padding-inline: 2px; }
+}
+
+/* 减少动态效果时禁用频谱弹性和任何交互回弹；触屏不出现系统蓝色高亮。 */
+:root:not([data-ui-preset]) :is(.pl-btn,.cm-mini-btn,.cm-more-tab,.cm-setting):focus:not(:focus-visible) { outline: none !important; }
+:root:not([data-ui-preset]) :is(.pl-btn,.cm-mini-btn,.cm-more-tab,.cm-setting) { -webkit-tap-highlight-color: transparent !important; }
+:root:not([data-ui-preset]) :is(.pl-btn,.cm-mini-btn,.cm-more-tab,.cm-setting).cm-pressed {
+  transition-duration: 160ms !important; transform: scale(.92); box-shadow: var(--cm-e-pressure);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-ui-preset]) :is(.pl-btn,.cm-mini-btn,.cm-more-tab,.cm-setting) { animation: none !important; transition: none !important; }
 }

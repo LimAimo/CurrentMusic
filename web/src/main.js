@@ -226,12 +226,14 @@ function boot() {
     header.style.setProperty('--cm-scroll-blend', Math.round(amount * 16) + '%');
     header.style.setProperty('--cm-header-clear', Math.round(amount * 28) + '%');
     header.style.setProperty('--cm-header-border', Math.round(amount * 24) + '%');
+    header.style.setProperty('--cm-header-blur', (amount * 14).toFixed(1) + 'px');
     header.classList.toggle('scrolled', amount > .06);
   };
   outEl.addEventListener('scroll', () => {
     if (!headerFrame) headerFrame = requestAnimationFrame(paintHeader);
   }, { passive: true });
   document.addEventListener('cm-uipreset', paintHeader);
+  document.addEventListener('cm-header-repaint', paintHeader);
   window.addEventListener('resize', paintHeader, { passive: true });
   paintHeader();
   // Android 软键盘和移动浏览器地址栏改变实际可视高度时，让弹窗跟随而不溢出。
