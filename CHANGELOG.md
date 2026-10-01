@@ -5,6 +5,13 @@ CurrentMusic 的完整版本历史（最新在上）。每个版本都对应一�
 
 ---
 
+> **v1.28.4**：**歌曲条新增「播放 MV」按钮 + 播放页「更多」新增「歌曲百科」入口**。
+> · **播放 MV**：歌曲条右侧（时长左边）出现 `smart_display` 图标，**仅当该曲有 MV 时显示**（歌曲数据新增 `mv` 字段，服务端 `_norm_song` 与前端 `ncmSong` 都补上）。点击后全屏浮层播放：`/ncm/mv/url?id=&r=1080` 解析地址（上游没有 1080 档会**降级**返回，响应里的 `r` 是实际档），直链实测 `206 + video/mp4`；播放 MV 时**自动暂停音乐**，关闭后**恢复原播放状态**（`Esc` 或点空白处也能关）。
+> · **歌曲百科**：播放页右上角「更多」→「歌曲百科」，弹窗展示封面/歌名/歌手/专辑 + 章节内容。数据来自新增的本地端点 `GET /song/wiki?id=`：上游 `/song/wiki/info` 是**页面级拼装结构**（`blocks[].blockInfo.{blockName,desc,wikiSubElementVos[].{title,wikiSubMetaVos[].text}}`），前端直接解析既脆又难读，服务端归一化成 `{name,artist,album,cover,sections:[{name,fields:[[标题,值]],desc}]}` 并缓存 7 天。实测「海阔天空」返回 2 章节（创作信息 / 基本信息）、20 个字段、百科正文完整。
+> · **为什么走事件而不是 import**：`ui.js` 渲染歌曲条，而 `player.js` 已 import `ui.js`；MV 浮层需要 `player` 来暂停音乐，若 `ui.js` 再 import 它即成循环依赖 → 改为 `ui.js` 派发 `cm-playmv` 事件、`mv.js` 监听处理。
+> · 验证：搜索「海阔天空」10 行结果中 4 行出现 MV 按钮（其余无 MV 不显示）；点击后浮层标题正确、`src` 为 https 直链、关闭后浮层移除；MV 打开时音乐暂停、关闭后恢复；行布局实测**行高与无 MV 行一致（64px）**、按钮 30px、歌名未被挤压。
+> · 说明：无头浏览器**没有 H.264 解码器**（`canPlayType('video/mp4; codecs="avc1…"')` 返回空，`error code 4`），因此"画面能播"这一条只能在真机验证；地址有效性已用 `curl` 确认（206 / `video/mp4` / 34.5MB）。
+
 > **v1.28.3**：**首屏改为聚合请求**（登录用户 4 次请求 → 1 次），针对"公网经 CloudFlare 会不会太慢"的实测优化。
 > · **先测清楚**：音频流根本不经过服务器（播放地址是网易 CDN，`m801.music.126.net`），带宽大头与 CF 无关；CF 只承载 KB 级 JSON API，动态请求不缓存（`cf-cache-status: DYNAMIC`），静态外壳已被 CF 缓存 4 小时（`/app/app.js` → `max-age=14400`）。源站处理一次只要 2~5ms，**瓶颈全在网络连接与往返次数**上。
 > · **做法**：新增 `GET /bootstrap`，服务端并行取好 me / daily / bind / recent 一次返回（`ThreadPoolExecutor`，单项失败只置空，绝不影响其它分片）。四个接口的原有逻辑抽成 `_payload_*` 函数，`/auth/me`、`/daily`、`/ncmbind`、`/plays/recent` 与聚合端点**共用同一实现**，不分叉。
