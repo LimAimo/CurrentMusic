@@ -103,12 +103,13 @@ function setOrRemove(el, prop, value) {
  */
 export function applyCustomize({ rebuild = false } = {}) {
   const el = document.documentElement;
-  const bg = bgImage();
+  const glassMode = ['frost', 'glass'].includes(el.getAttribute('data-ui-preset'));
+  const bg = glassMode ? bgImage() : '';
   // url("...") 里可能出现引号/括号，用 CSS 转义包一层，避免拼进 url() 后被截断
   setOrRemove(el, '--cm-bg-image', bg ? `url("${bg.replace(/["\\]/g, '\\$&')}")` : null);
-  setOrRemove(el, '--frs-lens-blur', String(glassBlur()));
+  setOrRemove(el, '--frs-lens-blur', glassMode ? String(glassBlur()) : null);
   const t = glassTint();
-  setOrRemove(el, '--frs-alpha', t == null ? null : String(t));
+  setOrRemove(el, '--frs-alpha', !glassMode || t == null ? null : String(t));
   if (rebuild) {
     try { document.dispatchEvent(new Event('cm-uipreset')); } catch (e) { /* 忽略 */ }
   }
@@ -131,3 +132,6 @@ export function resetGlass() {
   localStorage.removeItem(TINT_KEY);
   applyCustomize({ rebuild: true });
 }
+
+// 切换主题时重新应用对应的专属变量，保留其他主题用户值但不跨主题生效。
+document.addEventListener('cm-uipreset', () => applyCustomize());

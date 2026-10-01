@@ -220,8 +220,12 @@ function boot() {
   let headerFrame = 0;
   const paintHeader = () => {
     headerFrame = 0;
-    const amount = Math.max(0, Math.min(1, outEl.scrollTop / 56));
-    header.style.setProperty('--cm-scroll-blend', Math.round(amount * 100) + '%');
+    // 内容真正进入顶栏之后才显示模糊；28px 内完成由平面到半透明的连续过渡。
+    const amount = Math.max(0, Math.min(1, (outEl.scrollTop - 2) / 28));
+    header.style.setProperty('--cm-scroll-amount', amount.toFixed(3));
+    header.style.setProperty('--cm-scroll-blend', Math.round(amount * 16) + '%');
+    header.style.setProperty('--cm-header-clear', Math.round(amount * 28) + '%');
+    header.style.setProperty('--cm-header-border', Math.round(amount * 24) + '%');
     header.classList.toggle('scrolled', amount > .06);
   };
   outEl.addEventListener('scroll', () => {

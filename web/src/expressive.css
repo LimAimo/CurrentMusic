@@ -214,3 +214,40 @@ html[data-cm-wave-off] .pl-seekbar .cm-wavy-track { display: none !important; }
 .pl-seekbar .cm-wavy-track { overflow: hidden !important; }
 :root:not([data-ui-preset]) .cm-wavy-track path { stroke-width: 3.25; }
 :root:not([data-ui-preset]) .pl-waveform canvas { filter: none !important; image-rendering: auto; }
+
+/* 顶栏：未滚动与页面同层，只有内容穿过时出现极薄的真实背景模糊。 */
+:root:not([data-ui-preset]) #topbar,
+:root:not([data-ui-preset]) #topbar.scrolled,
+:root.mdui-theme-dark:not([data-ui-preset]) #topbar,
+:root.mdui-theme-dark:not([data-ui-preset]) #topbar.scrolled {
+  --cm-header-clear: 0%; --cm-header-border: 0%; --cm-scroll-amount: 0;
+  background: color-mix(in srgb, var(--cm-e-bg) calc(100% - var(--cm-header-clear)), transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--cm-e-outline) var(--cm-header-border), transparent);
+  box-shadow: none; backdrop-filter: blur(calc(var(--cm-scroll-amount) * 14px));
+  -webkit-backdrop-filter: blur(calc(var(--cm-scroll-amount) * 14px));
+}
+/* 扁平设置：去掉大容器、夸张行间距及多余侧边留白。 */
+:root:not([data-ui-preset]) .cm-setting-list {
+  background: transparent !important; border: 0; border-radius: 0;
+  box-shadow: none; overflow: visible; padding: 0 4px; max-width: 760px;
+}
+:root:not([data-ui-preset]) .cm-setting {
+  box-sizing: border-box; min-height: 54px; height: auto; padding: 9px 4px;
+  display: flex; gap: 10px; align-items: center; border-radius: 0;
+  background: transparent; border-bottom: 1px solid color-mix(in srgb, var(--cm-e-outline) 20%, transparent);
+  font-size: calc(13.5px * var(--cm-fs,1)); line-height: 1.35;
+}
+:root:not([data-ui-preset]) .cm-setting:last-child { border-bottom-color: transparent; }
+:root:not([data-ui-preset]) .cm-setting > * + * { margin-left: 0; }
+:root:not([data-ui-preset]) .cm-setting > .material-icons-outlined { flex: 0 0 22px; font-size: 21px; }
+:root:not([data-ui-preset]) .cm-setting > i {
+  flex: 0 1 auto; min-width: 0; max-width: 55%; margin-left: auto;
+  font-size: calc(12px * var(--cm-fs,1)); opacity: .9;
+}
+:root:not([data-ui-preset]) .cm-sec-head { margin-top: 20px; margin-bottom: 4px; }
+:root:not([data-ui-preset]) .cm-sec-head h2 { font-size: calc(17px * var(--cm-fs,1)); }
+:root:not([data-ui-preset]) .cm-setting-list + .cm-sec-head { margin-top: 24px; }
+@media (max-width: 600px) {
+ :root:not([data-ui-preset]) .cm-setting-list { margin-inline: 0; }
+ :root:not([data-ui-preset]) .cm-setting { gap: 9px; padding-inline: 2px; }
+}
