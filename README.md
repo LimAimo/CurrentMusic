@@ -2,8 +2,11 @@
 
 基于网易云音乐 SVIP 自建音源自建账号体系的 Android 音乐应用。MDUI 2（Material Design 3）设计语言。
 
-![version](https://img.shields.io/badge/version-1.26.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
+![version](https://img.shields.io/badge/version-1.26.1-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
 
+> **v1.26.1**：**首页「每日推荐」上移到「一键开听」下方**。
+> 顺序变为：一键开听 → **每日推荐** → 继续播放 → 猜你喜欢 → 每日推荐歌单 → 排行榜 → 一起听。
+> 每日推荐是每天最常听的一组，放在快捷入口正下方更顺手；骨架屏顺序同步调整，首屏不再先闪列表再变卡片。
 > **v1.26.0**：**发现页默认「音乐」+ TAB 切换动画 + Pad 比例修正**。
 > · **默认 TAB 改为「音乐」**（发现页的主体是找歌）。仍保留会话记忆：手动切到「用户/帖子」后，
 >   本次会话内再进发现页会回到你选的那个；也支持深链 `#/square?tab=users`。
