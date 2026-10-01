@@ -16,7 +16,8 @@ test('平台能力：普通浏览器绝不误判为 Android App', async () => {
     assert.equal(isAndroidApp(), true);
     assert.equal(canNativeDownload(), true);
     assert.equal(canDlna(), true);
-    assert.equal(canInstallApk(), true);+  } finally { globalThis.window = old; }
+    assert.equal(canInstallApk(), true);
+  } finally { globalThis.window = old; }
 });
 
 test('Web 不显示 APK 宣传、下载目录、原生 DLNA 和 WebView 更新入口', async () => {
