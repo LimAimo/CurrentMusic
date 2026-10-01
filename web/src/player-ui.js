@@ -3,7 +3,7 @@ import { mountWavyTrack } from './expressive.js';
 // 播放器 UI：底部迷你条 + 全屏播放页（封面/歌词/进度/音质/点赞/收藏/加入歌单）。
 import { mdui } from './md.js';
 import { createWaveform, WAVE_STYLE } from './waveform.js';
-import { waveStyle, waveTilt } from './customize.js';
+import { waveStyle, waveTilt, waveEnabled, setWaveEnabled } from './customize.js';
 import { api, auth, settings } from './api.js';
 import { esc, toast, fmtDur, tierLabel, QUALITY_TIERS, getStatus, setStatus, ensureStatus, openLikeMenu, isNcmLiked, ensureNcmLiked, skelComments, coverColors, defaultLyricSizeKey, getColorSchemeKey, applyColorScheme } from './ui.js';
 import { player, wave, on } from './player.js';
@@ -37,8 +37,25 @@ const overlay = () => document.getElementById('playerOverlay');
 // 之前这里是一组固定高度的柱子 + CSS 呼吸动画 —— 那与音乐无关，只是看起来在动；
 // 现在只有拿到真实频谱才画起伏，拿不到就画静默基线（不假装有律动）。
 let waveCtl = null;          // 当前播放页的波形控制器（关闭时销毁）
+let lyricHintShown = false;  // 每次页面启动后只提示一次（不写持久存储）
+let lyricHintTimer = 0;
+function showLyricHint() {
+  if (lyricHintShown || window.matchMedia('(min-width: 600px)').matches) return;
+  lyricHintShown = true;
+  const ov = overlay();
+  if (!ov || ov.hidden) return;
+  const hint = document.createElement('button');
+  hint.type = 'button'; hint.className = 'pl-lyric-hint';
+  hint.textContent = '长按歌词摘录 · 点击关闭';
+  hint.setAttribute('aria-label', '关闭歌词摘录提示');
+  const close = () => { clearTimeout(lyricHintTimer); hint.remove(); };
+  hint.onclick = close;
+  ov.appendChild(hint);
+  lyricHintTimer = setTimeout(close, 5000);
+}
+
 function waveformHTML() {
-  return `<div class="pl-waveform" id="plWaveform" aria-hidden="true"><canvas id="plWaveCanvas"></canvas></div>`;
+  return `<div class="pl-waveform" id="plWaveform" aria-hidden="true" ${waveEnabled() ? '' : 'hidden'}><canvas id="plWaveCanvas"></canvas></div>`;
 }
 
 // ---------- 迷你条 ----------
@@ -160,6 +177,7 @@ function setPlayerView(v) {
   const bodyEl = document.querySelector('.pl-body');
   if (bodyEl) bodyEl.className = `pl-body view-${v}`;
   if (v === 'lyric') {
+    showLyricHint();
     // 视图尺寸变化后：重算垫片并让当前行重新居中
     requestAnimationFrame(() => {
       layoutLyricPads();
@@ -470,13 +488,14 @@ async function openFull() {
           </div>
         </div>
         <div class="pl-right">
-          <div class="pl-lyric-action"><span>点击歌词跳转 · 长按或点此摘录</span><button type="button" class="pl-lyric-mark" id="plLyricMark"><span class="material-icons-outlined" aria-hidden="true">bookmark_add</span>摘录当前句</button></div>
+          <div class="pl-lyric-action"><button type="button" class="pl-lyric-mark" id="plLyricMark"><span class="material-icons-outlined" aria-hidden="true">bookmark_add</span>摘录当前句</button></div>
           <div class="pl-lyric" id="plLyric"></div>
         </div>
       </div>
     </div>`;
 
   ov.querySelector('#plClose').onclick = closeFull;
+  if (playerView === 'lyric') showLyricHint();
   bindArtistLinks(ov);
 
   // 窄屏：点击封面/周围空白 ↔ 整屏歌词 双视图切换（≥600px 双栏不参与）
@@ -523,7 +542,7 @@ async function openFull() {
   // （投屏时这两个值来自设备上报，直接读 audio 会是 0）
   const canvas = ov.querySelector('#plWaveCanvas');
   if (waveCtl) { waveCtl.destroy(); waveCtl = null; }
-  if (canvas) {
+  if (canvas && waveEnabled()) {
     // 纯波形指示：不接收进度（进度由下面专门的可拖动进度条表达）
     waveCtl = createWaveform(canvas, {
       read: u8 => wave.read(u8),
@@ -608,6 +627,8 @@ function closeFull() {
   // 的 canvas 上绘制——后台空转费电（AI 审查指出的一处真实泄漏）。
   if (waveCtl) { waveCtl.destroy(); waveCtl = null; window.__cmWave = null; }
   if (springRaf) { cancelAnimationFrame(springRaf); springRaf = 0; }
+  clearTimeout(lyricHintTimer);
+  ov.querySelector('.pl-lyric-hint')?.remove();
   ov.classList.add('closing');
   setTimeout(() => { ov.hidden = true; ov.innerHTML = ''; ov.classList.remove('closing'); }, 240);
 }
@@ -617,8 +638,10 @@ function closeFull() {
   const ov = overlay();
   if (!ov || ov.hidden) return;
   const canvas = ov.querySelector('#plWaveCanvas');
-  if (!canvas) return;
   if (waveCtl) { waveCtl.destroy(); waveCtl = null; }
+  const wrap = ov.querySelector('#plWaveform');
+  if (wrap) wrap.hidden = !waveEnabled();
+  if (!canvas || !waveEnabled()) { window.__cmWave = null; return; }
   waveCtl = createWaveform(canvas, {
     read: u8 => wave.read(u8), bins: () => wave.bins, rate: () => wave.sampleRate,
     tilt: waveTilt(), style: waveStyle(),
@@ -655,6 +678,10 @@ function openMoreDrawer() {
       </div>
       </div>
       <div class="cm-more-pane" data-section="appearance" role="tabpanel" hidden>
+      <div class="cm-more-row">
+        <div><div class="cm-more-t">实时频谱</div><div class="cm-more-s">显示清晰的圆角频谱；关闭后只保留进度条</div></div>
+        <mdui-switch id="mWave" aria-label="实时频谱" ${waveEnabled() ? 'checked' : ''}></mdui-switch>
+      </div>
       <div class="cm-more-row">
         <div><div class="cm-more-t">沉浸模式</div><div class="cm-more-s">封面主色流动渐变铺满播放页</div></div>
         <mdui-switch id="mGrad" ${bgGradOn ? 'checked' : ''}></mdui-switch>
@@ -723,6 +750,7 @@ function openMoreDrawer() {
       renderLyric();
       stopKaraoke(); startKaraoke(); fireKaraoke();
     });
+    diag.querySelector('#mWave').addEventListener('change', e => { setWaveEnabled(e.target.checked); });
     diag.querySelector('#mGrad').addEventListener('change', e => {
       bgGradOn = e.target.checked;
       localStorage.setItem('cm.bgGrad', bgGradOn ? '1' : '0');

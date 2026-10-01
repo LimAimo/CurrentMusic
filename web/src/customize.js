@@ -14,6 +14,14 @@
 
 
 // 播放页波形样式（纯指示，不表达进度）：bars（默认）| wave | capsule
+// 音乐频谱独立于波浪播放进度；用户可随时关闭，默认启用。
+const WAVE_ENABLED_KEY = 'cm.waveEnabled';
+export function waveEnabled() { return localStorage.getItem(WAVE_ENABLED_KEY) !== '0'; }
+export function setWaveEnabled(on) {
+  localStorage.setItem(WAVE_ENABLED_KEY, on ? '1' : '0');
+  document.dispatchEvent(new Event('cm-wavecfg'));
+}
+
 const WAVE_KEY = 'cm.waveStyle';
 const WAVE_KEYS = ['bars', 'wave', 'capsule'];
 
