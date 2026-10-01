@@ -102,3 +102,37 @@
   :root:not([data-ui-preset]) .pl-stats:has(mdui-linear-progress)::after { animation: none; }
   :root:not([data-ui-preset]) :is(.cm-card, .cm-quick, .cm-setting, .navItem) { transition: none; }
 }
+
+/* 阶段 5：完全融入背景的 MD3E 顶栏，滚动时通过 tonal elevation 连续插值而非跳变。 */
+:root:not([data-ui-preset]) #topbar,
+:root:not([data-ui-preset]) #topbar.scrolled,
+:root.mdui-theme-dark:not([data-ui-preset]) #topbar,
+:root.mdui-theme-dark:not([data-ui-preset]) #topbar.scrolled {
+  --cm-scroll-blend: 0%;
+  background: color-mix(in srgb, var(--cm-e-mid) var(--cm-scroll-blend), var(--cm-e-bg));
+  box-shadow: 0 4px 23px color-mix(in srgb, var(--cm-e-shadow) var(--cm-scroll-blend), transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--cm-e-outline) var(--cm-scroll-blend), transparent);
+  transition: none;
+}
+:root:not([data-ui-preset]) #topbar #topActs > :is(a,button),
+:root:not([data-ui-preset]) #topbar #topBack { border-radius: 18px 25px 18px 25px; }
+:root:not([data-ui-preset]) #topbar #topActs > :is(a,button).cm-pressed,
+:root:not([data-ui-preset]) #topbar #topBack.cm-pressed {
+  border-radius: 27px 16px 26px 17px; background-color: var(--cm-e-tint) !important;
+  box-shadow: var(--cm-e-pressure); transform: scale(.94);
+}
+:root:not([data-ui-preset]) #pageTitle { letter-spacing: -.025em; font-weight: 710; }
+:root:not([data-ui-preset]) :is(.cm-mini-btn, .pl-btn, .cm-dislike):focus-visible {
+  outline: 2px solid var(--cm-primary); outline-offset: 2px;
+}
+/* 手指点击无浏览器高亮；键盘焦点由自定义紫色细环接管。 */
+:where(button,a,[role="button"],[role="tab"]):focus:not(:focus-visible) { outline: none !important; }
+@media (max-width: 599px) {
+  :root:not([data-ui-preset]) #topbar { padding-left: 8px; padding-right: 8px; gap: 4px; }
+  :root:not([data-ui-preset]) #topbar #pageTitle { font-size: 20px; min-width: 0; flex: 1; }
+  :root:not([data-ui-preset]) #topActs { gap: 0; }
+  :root:not([data-ui-preset]) #topActs > :is(a, button), :root:not([data-ui-preset]) #topBack { width: 46px; height: 46px; min-width: 46px; min-height: 46px; }
+  :root:not([data-ui-preset]) .cm-more-tabs { gap: 3px; padding: 3px; }
+  :root:not([data-ui-preset]) .cm-more-tab { font-size: 12px; padding-inline: 3px; }
+  :root:not([data-ui-preset]) :is(.cm-quick,.cm-card,.cm-setting) { contain: layout style; }
+}

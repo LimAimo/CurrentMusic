@@ -135,7 +135,7 @@ mdui-dialog.cm-adaptive-dialog {
 mdui-dialog.cm-adaptive-dialog::part(panel) {
   box-sizing: border-box;
   width: min(560px, calc(100vw - 24px));
-  max-height: min(90dvh, calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  max-height: min(90dvh, calc(var(--cm-vvh, 100dvh) - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -152,7 +152,7 @@ mdui-dialog.cm-adaptive-dialog::part(content) { min-height: 0; overflow-y: auto;
 mdui-dialog.cm-adaptive-dialog :is([slot="action"], [slot="actions"]) { flex-shrink: 0; }
 @media (max-width: 600px) {
   mdui-dialog.cm-adaptive-dialog::part(panel) { width: calc(100vw - 24px); max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
-  .cm-dialog-scroll { max-height: calc(100dvh - 178px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+  .cm-dialog-scroll { max-height: calc(var(--cm-vvh, 100dvh) - 178px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
 }
 /* 通用按压状态层：元素自身的背景变化，不再生成漂移到标题上的蓝色涟漪。 */
 :where(html, body, button, a, [role="button"], [role="tab"], mdui-button, mdui-chip) { -webkit-tap-highlight-color: transparent !important; }

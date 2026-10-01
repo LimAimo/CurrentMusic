@@ -184,6 +184,7 @@ async function router() {
   if (currentVersion !== routeVersion) return;
   // 只有后退才恢复旧位置；主动刷新保留当前位置，新页面归零。
   if (changed && navDirection === 'back') out().scrollTop = routeScroll.get(hash) || 0;
+  document.getElementById('topbar')?.style.setProperty('--cm-scroll-blend', Math.round(Math.min(1, out().scrollTop / 56) * 100) + '%');
 }
 
 function boot() {
@@ -213,11 +214,28 @@ function boot() {
   initAccessibleControls(); // 动态页面补齐键盘操作、焦点和可访问名称
   initExpressive(); // 只增强 MD3E：变形加载指示器与切换场景兼容
 
-  // MD3 top app bar：内容滚动时切换 surface 层级 + elevation
+  // 顶栏从页面底色连续插值到 raised tonal surface。用一帧批量更新，避免每次 scroll 重排。
   const outEl = out();
+  const header = document.getElementById('topbar');
+  let headerFrame = 0;
+  const paintHeader = () => {
+    headerFrame = 0;
+    const amount = Math.max(0, Math.min(1, outEl.scrollTop / 56));
+    header.style.setProperty('--cm-scroll-blend', Math.round(amount * 100) + '%');
+    header.classList.toggle('scrolled', amount > .06);
+  };
   outEl.addEventListener('scroll', () => {
-    document.getElementById('topbar').classList.toggle('scrolled', outEl.scrollTop > 8);
+    if (!headerFrame) headerFrame = requestAnimationFrame(paintHeader);
   }, { passive: true });
+  document.addEventListener('cm-uipreset', paintHeader);
+  window.addEventListener('resize', paintHeader, { passive: true });
+  paintHeader();
+  // Android 软键盘和移动浏览器地址栏改变实际可视高度时，让弹窗跟随而不溢出。
+  if (window.visualViewport) {
+    const syncViewport = () => document.documentElement.style.setProperty('--cm-vvh', window.visualViewport.height + 'px');
+    window.visualViewport.addEventListener('resize', syncViewport, { passive: true });
+    syncViewport();
+  }
   window.addEventListener('hashchange', router);
   if (!location.hash) location.hash = '#/home';
   router();
