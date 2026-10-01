@@ -124,8 +124,14 @@ Android App（Java WebView 壳，无 androidx / 无 Gradle）
 ```bash
 cd web
 npm install
-node build.mjs          # 产物输出到 app/src/main/assets/www
+npm test                # 前端源码回归检查（无测试框架依赖）
+npm run build           # 产物输出到 app/src/main/assets/www
+npm run preview         # 本地静态预览：http://127.0.0.1:4173/
+# 或者：npm run dev  # 一次性构建后启动预览服务器
 ```
+
+> 本地预览只运行**前端静态文件**，不会自动启动服务端。首次打开可在「设置 → 服务器地址」配置你自己的 CurrentMusic 后端；后端需允许当前网页来源（CORS），或通过同源代理访问。未配置后端时可预览界面，但登录、音源代理、歌单、多人同听等联网功能不可用。
+> 前端修订内容和真机/后端待验证项参见 [UI/UX 修订说明](docs/UI_UX_CHANGELOG.md)。
 
 打包 APK（需要 JDK 17 与 Android SDK，build-tools 34）：
 
