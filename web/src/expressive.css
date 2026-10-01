@@ -1,0 +1,138 @@
+/* Material 3 Expressive: 仅 md3 预设生效，frost / glass 仍保留原有风格。 */
+:root:not([data-ui-preset]) {
+  --cm-e-bg: #f8f6fb;
+  --cm-e-surface: #f8f6fb;
+  --cm-e-low: #f3eff8;
+  --cm-e-mid: #eee7f6;
+  --cm-e-high: #e7e0f0;
+  --cm-e-tint: color-mix(in srgb, var(--cm-primary) 16%, #ece6f4);
+  --cm-e-outline: color-mix(in srgb, var(--cm-primary) 17%, #d7d0dd);
+  --cm-e-shadow: rgba(47,30,76,.13);
+  --cm-e-pressure: inset 0 2px 9px rgba(45,27,68,.11);
+  --cm-e-motion: cubic-bezier(.2, 0, 0, 1);
+  --cm-e-radius-sm: 15px;
+  --cm-e-radius-md: 24px;
+  --cm-e-radius-lg: 32px;
+  --cm-e-radius-xl: 38px;
+}
+:root.mdui-theme-dark:not([data-ui-preset]) {
+  --cm-e-bg: #101017;
+  --cm-e-surface: #101017;
+  --cm-e-low: #1c1923;
+  --cm-e-mid: #25202d;
+  --cm-e-high: #322b3b;
+  --cm-e-tint: color-mix(in srgb, var(--cm-primary) 20%, #2d2536);
+  --cm-e-outline: color-mix(in srgb, var(--cm-primary) 17%, #65586e);
+  --cm-e-shadow: rgba(0,0,0,.34);
+  --cm-e-pressure: inset 0 3px 15px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.025);
+}
+:root:not([data-ui-preset]) body { background-color: var(--cm-e-bg); }
+:root:not([data-ui-preset]) :is(#out, .cm-page) { background-color: transparent; }
+:root:not([data-ui-preset]) #bottomNav {
+  background: var(--cm-e-low); border-top: 1px solid var(--cm-e-outline);
+  box-shadow: 0 -5px 28px color-mix(in srgb, var(--cm-e-shadow) 40%, transparent);
+}
+:root:not([data-ui-preset]) .navItem.cur .nav-ic {
+  border-radius: 17px 24px 17px 24px; background: var(--cm-e-tint);
+  transition: background 260ms var(--cm-e-motion), border-radius 360ms var(--cm-e-motion), transform 280ms var(--cm-e-motion);
+}
+:root:not([data-ui-preset]) .navItem.cm-pressed .nav-ic { border-radius: 24px 15px 23px 17px; transform: scale(.93); }
+:root:not([data-ui-preset]) .cm-mini-inner {
+  border-radius: 28px; background: var(--cm-e-mid); border: 1px solid var(--cm-e-outline);
+  box-shadow: 0 5px 18px var(--cm-e-shadow);
+}
+:root:not([data-ui-preset]) :is(.cm-quick, .cm-setting-list, .cm-login-tip, .cm-card img, .cm-plcard) {
+  background-color: var(--cm-e-low); border-color: var(--cm-e-outline); transition: background-color 220ms var(--cm-e-motion), border-radius 300ms var(--cm-e-motion), box-shadow 250ms var(--cm-e-motion);
+}
+:root:not([data-ui-preset]) .cm-quick { border-radius: 28px 20px 28px 20px; min-height: 74px; }
+:root:not([data-ui-preset]) .cm-card img { border-radius: 30px 18px 30px 18px; box-shadow: 0 6px 18px var(--cm-e-shadow); }
+:root:not([data-ui-preset]) .cm-card:active img { border-radius: 20px 30px 20px 30px; }
+:root:not([data-ui-preset]) .cm-setting-list { border-radius: 28px; }
+:root:not([data-ui-preset]) .cm-setting { min-height: 50px; padding-block: 16px; border-bottom-color: var(--cm-e-outline); }
+:root:not([data-ui-preset]) :is(.cm-quick, .cm-setting, .cm-plcard, .cm-qm-item).cm-pressed {
+  background: var(--cm-e-tint) !important; box-shadow: var(--cm-e-pressure);
+}
+:root:not([data-ui-preset]) :is(.cm-search-go, .cm-retry, .pl-lyric-mark, .cm-more-tab.active) {
+  border-radius: 19px 25px 19px 25px;
+  transition: border-radius 280ms var(--cm-e-motion), transform 280ms var(--cm-e-motion), background 180ms ease;
+}
+:root:not([data-ui-preset]) :is(.cm-search-go, .cm-retry, .pl-lyric-mark):active { border-radius: 26px 17px 26px 17px; transform: scale(.95); }
+:root:not([data-ui-preset]) :is(.cm-more-tabs, .cm-setting-list, .cm-qm-item) { background-color: var(--cm-e-mid); }
+:root:not([data-ui-preset]) mdui-dialog::part(panel) { border-radius: 34px; background: var(--cm-e-mid); border: 1px solid var(--cm-e-outline); box-shadow: 0 22px 65px var(--cm-e-shadow); }
+:root.mdui-theme-dark:not([data-ui-preset]) mdui-dialog::part(panel) { box-shadow: 0 23px 70px rgba(0,0,0,.57), inset 0 1px rgba(255,255,255,.035); }
+:root:not([data-ui-preset]) .cm-sec-head h2 { font-size: calc(19px * var(--cm-fs,1)); font-weight: 730; letter-spacing: -.025em; }
+:root:not([data-ui-preset]) .cm-greet-title { font-weight: 730; letter-spacing: -.035em; }
+:root:not([data-ui-preset]) :is(mdui-button, mdui-chip) { --mdui-comp-button-container-shape: 23px; --mdui-comp-chip-container-shape: 17px; }
+/* 用一致的变形加载组件取代散落的圆圈，仅 Material 3 Expressive 启用。 */
+.cm-morph-loader { display: none; }
+:root:not([data-ui-preset]) mdui-circular-progress + .cm-morph-loader {
+  width: 28px; height: 28px; display: inline-grid; flex: none; place-items: center; position: relative; color: var(--cm-primary);
+}
+:root:not([data-ui-preset]) mdui-circular-progress:has(+ .cm-morph-loader) { display: none; }
+.cm-morph-loader::before { content: ''; width: 66%; height: 66%; display: block; background: currentColor; animation: cm-morph 1.8s cubic-bezier(.44,0,.23,1) infinite; }
+@keyframes cm-morph {
+  0%,100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg) scale(.77); }
+  32% { border-radius: 50% 50% 24% 76% / 75% 23% 77% 25%; transform: rotate(145deg) scale(1.12); }
+  65% { border-radius: 17% 83% 34% 66% / 54% 63% 37% 46%; transform: rotate(280deg) scale(.89); }
+}
+/* 播放器：真实的轻振幅可绘制波浪，拖动 range 始终位于 SVG 上层。 */
+:root:not([data-ui-preset]) .pl-seekbar .pl-fill { opacity: 0; }
+.pl-seekbar .cm-wavy-track { display: none; }
+:root:not([data-ui-preset]) .pl-seekbar .cm-wavy-track {
+  position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; pointer-events: none;
+  overflow: visible; color: var(--cm-primary);
+}
+.cm-wavy-track path { fill: none; stroke: currentColor; stroke-width: 4.4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+:root:not([data-ui-preset]) .pl-seekbar input[type=range] { z-index: 2; }
+:root:not([data-ui-preset]) .pl-seekbar input[type=range]::-webkit-slider-thumb { width: 17px; height: 17px; margin-top: -6.5px; background: #fff; border: 3px solid var(--cm-primary); box-shadow: 0 1px 7px rgba(0,0,0,.26); }
+:root:not([data-ui-preset]) .cm-mini-prog #miniProg {
+  height: 5px; border-radius: 0 5px 5px 0;
+  background: linear-gradient(90deg, var(--cm-primary), color-mix(in srgb, var(--cm-primary) 72%, #c79ffb));
+}
+:root:not([data-ui-preset]) .pl-stats:has(mdui-linear-progress) { position: relative; }
+:root:not([data-ui-preset]) .pl-stats mdui-linear-progress { display: none; }
+:root:not([data-ui-preset]) .pl-stats:has(mdui-linear-progress)::after {
+  content: ''; width: 120px; height: 10px; display: block;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 10'%3E%3Cpath d='M0 5Q8 0 16 5T32 5T48 5T64 5' fill='none' stroke='%23aa90d6' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x 0 center / 64px 10px;
+  animation: cm-wave-drift .9s linear infinite;
+}
+@keyframes cm-wave-drift { to { background-position-x: 64px; } }
+@media (prefers-reduced-motion: reduce) {
+  .cm-morph-loader::before { animation: none; border-radius: 50%; transform: none; }
+  :root:not([data-ui-preset]) .pl-stats:has(mdui-linear-progress)::after { animation: none; }
+  :root:not([data-ui-preset]) :is(.cm-card, .cm-quick, .cm-setting, .navItem) { transition: none; }
+}
+
+/* 阶段 5：完全融入背景的 MD3E 顶栏，滚动时通过 tonal elevation 连续插值而非跳变。 */
+:root:not([data-ui-preset]) #topbar,
+:root:not([data-ui-preset]) #topbar.scrolled,
+:root.mdui-theme-dark:not([data-ui-preset]) #topbar,
+:root.mdui-theme-dark:not([data-ui-preset]) #topbar.scrolled {
+  --cm-scroll-blend: 0%;
+  background: color-mix(in srgb, var(--cm-e-mid) var(--cm-scroll-blend), var(--cm-e-bg));
+  box-shadow: 0 4px 23px color-mix(in srgb, var(--cm-e-shadow) var(--cm-scroll-blend), transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--cm-e-outline) var(--cm-scroll-blend), transparent);
+  transition: none;
+}
+:root:not([data-ui-preset]) #topbar #topActs > :is(a,button),
+:root:not([data-ui-preset]) #topbar #topBack { border-radius: 18px 25px 18px 25px; }
+:root:not([data-ui-preset]) #topbar #topActs > :is(a,button).cm-pressed,
+:root:not([data-ui-preset]) #topbar #topBack.cm-pressed {
+  border-radius: 27px 16px 26px 17px; background-color: var(--cm-e-tint) !important;
+  box-shadow: var(--cm-e-pressure); transform: scale(.94);
+}
+:root:not([data-ui-preset]) #pageTitle { letter-spacing: -.025em; font-weight: 710; }
+:root:not([data-ui-preset]) :is(.cm-mini-btn, .pl-btn, .cm-dislike):focus-visible {
+  outline: 2px solid var(--cm-primary); outline-offset: 2px;
+}
+/* 手指点击无浏览器高亮；键盘焦点由自定义紫色细环接管。 */
+:where(button,a,[role="button"],[role="tab"]):focus:not(:focus-visible) { outline: none !important; }
+@media (max-width: 599px) {
+  :root:not([data-ui-preset]) #topbar { padding-left: 8px; padding-right: 8px; gap: 4px; }
+  :root:not([data-ui-preset]) #topbar #pageTitle { font-size: 20px; min-width: 0; flex: 1; }
+  :root:not([data-ui-preset]) #topActs { gap: 0; }
+  :root:not([data-ui-preset]) #topActs > :is(a, button), :root:not([data-ui-preset]) #topBack { width: 46px; height: 46px; min-width: 46px; min-height: 46px; }
+  :root:not([data-ui-preset]) .cm-more-tabs { gap: 3px; padding: 3px; }
+  :root:not([data-ui-preset]) .cm-more-tab { font-size: 12px; padding-inline: 3px; }
+  :root:not([data-ui-preset]) :is(.cm-quick,.cm-card,.cm-setting) { contain: layout style; }
+}

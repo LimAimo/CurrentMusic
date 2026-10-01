@@ -3,6 +3,7 @@ import { mdui } from '../md.js';
 import { api, settings, auth } from '../api.js';
 import { esc, toast, promptDialog, COLOR_SCHEMES, getColorSchemeKey, setColorSchemeKey, QUALITY_TIERS, tierLabel, FONT_SCALES, getFontScaleKey, setFontScaleKey } from '../ui.js';
 import { checkUpdate } from '../update.js';
+import { isAndroidApp } from '../platform.js';
 import { currentVersion, engineChrome, engineOutdated, ENGINE_MIN_RECOMMENDED } from '../version.js';
 import { UI_PRESETS, uiPresetKey, uiPresetName, setUiPreset } from '../uipreset.js';
 import { bgImage, glassBlur, glassTint, glassRange, setBgImage, setGlass, resetGlass, applyCustomize } from '../customize.js';
@@ -29,7 +30,7 @@ export function themeName() {
 
 export async function render(el) {
   const u = auth.user || {};
-  const isApp = !!(window.NativeApi && window.NativeApi.versionCode);   // App 内不显示网页专属入口
+  const isApp = isAndroidApp();
   el.innerHTML = `
     <div class="cm-sec-head"><h2>外观</h2></div>
     <div class="cm-setting-list">
@@ -42,10 +43,10 @@ export async function render(el) {
         <div class="cm-setting" id="waveTilt"><span class="material-icons-outlined">trending_up</span>频谱倾斜<i>${waveTilt() <= 0 ? '关闭' : waveTilt().toFixed(1) + ' dB/oct'}</i></div>
         <div class="cm-setting" id="fontScale"><span class="material-icons-outlined">format_size</span>字体大小<i>${esc((FONT_SCALES.find(x => x.key === getFontScaleKey()) || {}).label || '标准')}</i></div>
     </div>
-    <div class="cm-sec-head"><h2>播放与下载</h2></div>
+    <div class="cm-sec-head"><h2>${isApp ? '播放与下载' : '播放'}</h2></div>
     <div class="cm-setting-list">
       <div class="cm-setting" id="quality"><span class="material-icons-outlined">high_quality</span>默认音质<i>${tierLabel(settings.quality)}</i></div>
-      <div class="cm-setting" id="dlDir"><span class="material-icons-outlined">download</span>下载目录<i>Music/${esc(localStorage.getItem('cm.downloadDir') || 'CurrentMusic')}</i></div>
+      ${isApp ? `<div class="cm-setting" id="dlDir"><span class="material-icons-outlined">download</span>下载目录<i>Music/${esc(localStorage.getItem('cm.downloadDir') || 'CurrentMusic')}</i></div>` : ''}
     </div>
     <div class="cm-sec-head"><h2>隐私</h2></div>
     <div class="cm-setting-list">
@@ -62,12 +63,12 @@ export async function render(el) {
     </div>
     <div class="cm-sec-head"><h2>关于</h2></div>
     <div class="cm-setting-list">
-      ${!isApp ? `<div class="cm-setting" id="dlApk"><span class="material-icons-outlined">android</span>下载安卓版 APP<i>APK · 支持锁屏控制</i></div>` : ''}
-      <div class="cm-setting" id="checkUpd"><span class="material-icons-outlined">system_update</span>检查更新<i>v${esc(currentVersion().name)}<span class="material-icons-outlined" style="font-size:calc(15px * var(--cm-fs, 1));vertical-align:-3px;margin-left:4px">chevron_right</span></i></div>
+
+      <div class="cm-setting" id="checkUpd"><span class="material-icons-outlined">system_update</span>${isApp ? '检查更新' : '检查网页更新'}<i>v${esc(currentVersion().name)}<span class="material-icons-outlined" style="font-size:calc(15px * var(--cm-fs, 1));vertical-align:-3px;margin-left:4px">chevron_right</span></i></div>
       <div class="cm-setting"><span class="material-icons-outlined">person</span>当前账号<i>${esc(u.nickname || u.username || '未登录')}${u.isSuper ? ' · 超级管理员' : u.isAdmin ? ' · 管理员' : ''}</i></div>
       ${(auth.user && auth.user.isAdmin) ? `<div class="cm-setting" id="adminEntry"><span class="material-icons-outlined">admin_panel_settings</span>管理员面板<i>用户/设备/系统</i></div>` : ''}
       ${auth.token ? `<div class="cm-setting" id="devices"><span class="material-icons-outlined">devices</span>登录设备<i id="devCount">—</i></div>` : ''}
-      <div class="cm-setting" id="engine"><span class="material-icons-outlined">public</span>系统 WebView<i>${engineChrome() ? 'Chromium ' + engineChrome() : (isApp ? '未知' : '浏览器')}${engineOutdated() ? ' · 建议更新' : ''}</i></div>
+      ${isApp ? `<div class="cm-setting" id="engine"><span class="material-icons-outlined">public</span>系统 WebView<i>${engineChrome() ? 'Chromium ' + engineChrome() : '未知'}${engineOutdated() ? ' · 建议更新' : ''}</i></div>` : ''}
     </div>`;
 
   // 公开到发现页广场：关闭后不出现在广场列表（主页仍可被链接访问）
@@ -96,10 +97,6 @@ export async function render(el) {
       } finally { sqSw.disabled = false; }
     });
   }
-
-  el.querySelector('#dlApk')?.addEventListener('click', () => {
-    location.href = settings.base + '/download/latest';   // 后端 302 到最新版安装包
-  });
 
   el.querySelector('#scheme').onclick = () => {
     const cur = getColorSchemeKey();
@@ -136,7 +133,7 @@ export async function render(el) {
         <div class="cm-more-chips">${picks.map(p =>
           `<mdui-chip ${p.key === cur ? 'selected' : ''} data-k="${p.key}"><i class="cm-swatch ${p.swatch}"></i>${p.name}</mdui-chip>`).join('')}</div>
         <div class="cm-more-s" style="margin-top:10px">${esc((UI_PRESETS.find(p => p.key === cur) || {}).desc || '')}</div>
-        <div class="cm-more-s" style="margin-top:6px">「简约玻璃」把玻璃只用在顶栏/底栏/弹窗等浮层，内容卡片走磨砂白 + 发丝线、不用投影。旧版系统会自动降级为半透明纯色，不影响使用。Material 3 为无玻璃的原版样式。</div>
+        <div class="cm-more-s" style="margin-top:6px">「简约玻璃」把玻璃只用在顶栏/底栏/弹窗等浮层，内容卡片走磨砂白 + 发丝线、不用投影。旧版系统会自动降级为半透明纯色，不影响使用。Material 3 Expressive 包含动态配色、波浪进度与表达性动效。</div>
       </div>`,
       actions: [{ text: '关闭' }],
     });
@@ -389,11 +386,11 @@ export async function render(el) {
       });
     }, 0);
   };
-  el.querySelector('#dlDir').onclick = () => promptDialog({
+  el.querySelector('#dlDir')?.addEventListener('click', () => promptDialog({
     title: '下载目录', label: 'Music/ 下的子目录名', value: localStorage.getItem('cm.downloadDir') || 'CurrentMusic',
     onOk: v => { localStorage.setItem('cm.downloadDir', v.trim() || 'CurrentMusic'); toast('已保存'); render(el); },
-  });
-  el.querySelector('#engine').onclick = () => {
+  }));
+  el.querySelector('#engine')?.addEventListener('click', () => {
     const v = engineChrome();
     if (!engineOutdated()) return toast(`当前 WebView：Chromium ${v || '未知'}，无需更新`);
     mdui.dialog({
@@ -411,7 +408,7 @@ export async function render(el) {
           } },
       ],
     });
-  };
+  });
   el.querySelector('#adminEntry')?.addEventListener('click', () => { location.hash = '#/admin'; });
 
   const devRow = el.querySelector('#devices');

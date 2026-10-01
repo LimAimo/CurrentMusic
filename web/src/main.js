@@ -4,9 +4,12 @@ import 'mdui/mdui.css';
 import '@material-design-icons/font/outlined.css';
 import './app.css';
 import './ui-overhaul.css';
+import './expressive.css';
 import { auth, settings, setAuthExpiredHandler, warmDecorScales } from './api.js';
 import { toast, esc, initRipple, bootColorScheme, bootFontScale, initImageFade } from './ui.js';
 import { initAccessibleControls } from './ux-controls.js';
+import { initExpressive } from './expressive.js';
+import { isAndroidApp, canNativeInsets } from './platform.js';
 import { checkUpdate } from './update.js';
 import { initPullToRefresh } from './ptr.js';
 import { engineChrome, engineOutdated } from './version.js';
@@ -181,6 +184,7 @@ async function router() {
   if (currentVersion !== routeVersion) return;
   // 只有后退才恢复旧位置；主动刷新保留当前位置，新页面归零。
   if (changed && navDirection === 'back') out().scrollTop = routeScroll.get(hash) || 0;
+  document.getElementById('topbar')?.style.setProperty('--cm-scroll-blend', Math.round(Math.min(1, out().scrollTop / 56) * 100) + '%');
 }
 
 function boot() {
@@ -188,7 +192,7 @@ function boot() {
   bootColorScheme();   // 配色方案（默认动态取色，取色随播放封面变化）
   bootFontScale();     // 字体大小（默认标准；不跟随系统字号，见 ui.js FONT_SCALES）
   // 原生窗口 insets（env(safe-area-inset-*) 在多数 WebView 上恒为 0，用桥值兜底）
-  if (window.NativeApi && window.NativeApi.insets) {
+  if (canNativeInsets()) {
     try {
       const i = JSON.parse(window.NativeApi.insets());
       const rt = document.documentElement.style;
@@ -208,22 +212,30 @@ function boot() {
   document.getElementById('topBack').onclick = navigateBack;
   try { history.scrollRestoration = 'manual'; } catch { /* 旧版 WebView 不支持 */ }
   initAccessibleControls(); // 动态页面补齐键盘操作、焦点和可访问名称
+  initExpressive(); // 只增强 MD3E：变形加载指示器与切换场景兼容
 
-  // 网页版顶栏「下载安卓版 APP」入口（App 内有 NativeApi，不渲染）
-  if (!(window.NativeApi && window.NativeApi.versionCode)) {
-    const dl = document.createElement('a');
-    dl.id = 'dlApkTop';
-    dl.className = 'cm-dl-apk-top';
-    dl.title = '下载安卓版 APP';
-    dl.innerHTML = '<span class="material-icons-outlined">android</span><span>下载 APP</span>';
-    dl.href = settings.base + '/download/latest';
-    document.getElementById('topAction').before(dl);
-  }
-  // MD3 top app bar：内容滚动时切换 surface 层级 + elevation
+  // 顶栏从页面底色连续插值到 raised tonal surface。用一帧批量更新，避免每次 scroll 重排。
   const outEl = out();
+  const header = document.getElementById('topbar');
+  let headerFrame = 0;
+  const paintHeader = () => {
+    headerFrame = 0;
+    const amount = Math.max(0, Math.min(1, outEl.scrollTop / 56));
+    header.style.setProperty('--cm-scroll-blend', Math.round(amount * 100) + '%');
+    header.classList.toggle('scrolled', amount > .06);
+  };
   outEl.addEventListener('scroll', () => {
-    document.getElementById('topbar').classList.toggle('scrolled', outEl.scrollTop > 8);
+    if (!headerFrame) headerFrame = requestAnimationFrame(paintHeader);
   }, { passive: true });
+  document.addEventListener('cm-uipreset', paintHeader);
+  window.addEventListener('resize', paintHeader, { passive: true });
+  paintHeader();
+  // Android 软键盘和移动浏览器地址栏改变实际可视高度时，让弹窗跟随而不溢出。
+  if (window.visualViewport) {
+    const syncViewport = () => document.documentElement.style.setProperty('--cm-vvh', window.visualViewport.height + 'px');
+    window.visualViewport.addEventListener('resize', syncViewport, { passive: true });
+    syncViewport();
+  }
   window.addEventListener('hashchange', router);
   if (!location.hash) location.hash = '#/home';
   router();
@@ -243,7 +255,7 @@ function boot() {
   setAuthExpiredHandler(() => toast('登录已失效，请重新登录'));
 
   // 旧版渲染引擎一次性提示（引导更新 WebView，更新后可恢复最佳效果）
-  if (engineOutdated() && !sessionStorage.getItem('cm.engineHint')) {
+  if (isAndroidApp() && engineOutdated() && !sessionStorage.getItem('cm.engineHint')) {
     sessionStorage.setItem('cm.engineHint', '1');
     setTimeout(() => toast(`当前系统 WebView 较旧（Chromium ${engineChrome()}），建议在应用商店更新以获得最佳体验`), 4000);
   }

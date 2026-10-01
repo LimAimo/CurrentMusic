@@ -11,7 +11,7 @@ const KEY = 'cm.uiPreset';
 export const DEFAULT_PRESET = 'frost';
 
 export const UI_PRESETS = [
-  { key: 'md3', name: 'Material 3', desc: '原版样式（Material 3 · 无玻璃）', swatch: 'md3' },
+  { key: 'md3', name: 'Material 3 Expressive', desc: '表达性色彩 · 形态动效 · 波浪进度 · 分层暗色', swatch: 'md3' },
   { key: 'frost', name: '简约玻璃', desc: '默认 · 玻璃浮层 · 卡片磨砂白 + 发丝线', swatch: 'frost' },
   { key: 'glass', name: '液体玻璃', desc: '半透明玻璃 · 大圆角 · 柔和光影', swatch: 'glass' },
 ];
