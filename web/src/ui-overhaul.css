@@ -183,3 +183,9 @@ mdui-dialog.cm-adaptive-dialog :is([slot="action"], [slot="actions"]) { flex-shr
 @media (prefers-reduced-motion: reduce) {
   .cm-dialog-scroll, .cm-pressed, #topActs > *, #topBack { animation: none !important; transition: none !important; }
 }
+
+/* 网页更新只有刷新动作，不出现安装包来源；较小的正文减少小屏双重滚动。 */
+.cm-web-update { max-width: 100%; line-height: 1.65; font-size: 14px; }
+.cm-web-update-hero { width: 64px; height: 64px; margin: 6px auto 15px; border-radius: 22px; display: grid; place-items: center; color: var(--cm-primary); background: color-mix(in srgb, var(--cm-primary) 14%, transparent); }
+.cm-web-update-hero .material-icons-outlined { font-size: 32px; }
+.cm-web-update p { margin: 6px 0 12px; }
