@@ -126,10 +126,8 @@ html[data-ui-preset="frost"] :is(.cm-card-sub, .cm-song-sub, .cm-sec-sub) {
 
 /* 阶段 1 · 统一模态框 / 安全滚动：底部按钮不再被浏览器地址栏挡住。 */
 mdui-dialog.cm-adaptive-dialog {
+  /* 宿主本身仍需占满视口承载遮罩；只限制 ::part(panel)，避免弹窗定位错位。 */
   --mdui-comp-dialog-container-shape: 28px;
-  width: min(100%, 560px);
-  max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
-  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overscroll-behavior: contain;
 }
 mdui-dialog.cm-adaptive-dialog::part(panel) {

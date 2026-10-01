@@ -63,7 +63,7 @@ export async function render(el) {
     </div>
     <div class="cm-sec-head"><h2>关于</h2></div>
     <div class="cm-setting-list">
-      
+
       <div class="cm-setting" id="checkUpd"><span class="material-icons-outlined">system_update</span>${isApp ? '检查更新' : '检查网页更新'}<i>v${esc(currentVersion().name)}<span class="material-icons-outlined" style="font-size:calc(15px * var(--cm-fs, 1));vertical-align:-3px;margin-left:4px">chevron_right</span></i></div>
       <div class="cm-setting"><span class="material-icons-outlined">person</span>当前账号<i>${esc(u.nickname || u.username || '未登录')}${u.isSuper ? ' · 超级管理员' : u.isAdmin ? ' · 管理员' : ''}</i></div>
       ${(auth.user && auth.user.isAdmin) ? `<div class="cm-setting" id="adminEntry"><span class="material-icons-outlined">admin_panel_settings</span>管理员面板<i>用户/设备/系统</i></div>` : ''}
@@ -386,7 +386,7 @@ export async function render(el) {
       });
     }, 0);
   };
-  el.querySelector('#dlDir')?.addEventListener('click', = () => promptDialog({
+  el.querySelector('#dlDir')?.addEventListener('click', () => promptDialog({
     title: '下载目录', label: 'Music/ 下的子目录名', value: localStorage.getItem('cm.downloadDir') || 'CurrentMusic',
     onOk: v => { localStorage.setItem('cm.downloadDir', v.trim() || 'CurrentMusic'); toast('已保存'); render(el); },
   }));

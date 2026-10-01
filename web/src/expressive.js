@@ -25,7 +25,7 @@ export function initExpressive() {
 
 // Canvas 不参与：用 SVG 路径叠加在真实 range 下面，拖动期间自动收敛为直线，
 // 媒体进度和触摸目标仍由原生 range 负责。
-export function mountWavyTrack(bar, seek) {
+export function mountWavyTrack(bar, seek, player) {
   if (!bar || !seek || bar.querySelector('.cm-wavy-track')) return;
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
@@ -40,12 +40,13 @@ export function mountWavyTrack(bar, seek) {
   function draw(ts) {
     if (!bar.isConnected) return;
     frame = requestAnimationFrame(draw);
-    if (ts - last < 42) return; // ~24fps；后台/省电时调度由浏览器决定。
+    const playing = player?.isPlaying?.() && document.visibilityState === 'visible';
+    if (ts - last < (playing ? 42 : 250)) return; // 播放 ~24fps；暂停/后台 4fps。
     last = ts;
     const amount = Math.max(0, Math.min(1, Number(seek.value || 0) / 100));
     const end = Math.max(0, amount * 1000);
     const amp = !active() || reduced() || seek.dataset.drag ? 0 : 3.1;
-    if (active() && !reduced() && document.visibilityState === 'visible' && !seek.dataset.drag) phase += .16;
+    if (active() && !reduced() && playing && !seek.dataset.drag) phase += .16;
     const steps = Math.max(1, Math.ceil(end / 8));
     let d = 'M 0 12';
     for (let i = 1; i <= steps; i++) {

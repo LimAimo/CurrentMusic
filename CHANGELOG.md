@@ -5,6 +5,15 @@ CurrentMusic 的完整版本历史（最新在上）。每个版本都对应一�
 
 ---
 
+**开发中 · Material 3 Expressive / Web 体验修订（暂不作为 APK 正式发版）**
+
+- 全站对话框统一使用动态视口安全高度、固定操作区与正文独立滚动；顶栏搜索、返回、设置统一触控规格，原有漂移涟漪改为局部按压状态层，触摸无浏览器蓝框，键盘仍有可见焦点。
+- Web/App 能力按实际原生桥判断：网页不再展示 APK 推广、Android 下载目录、原生 DLNA 和系统 WebView 更新；网页版下载由浏览器处理，MediaSession 继续可用。
+- 网页版本检查只比较线上 `index.html` 的 JS 内容指纹，提供「刷新并应用」，不再复用 APK 下载弹窗。
+- Material 3 预设升级为 Material 3 Expressive：表达性色阶、深色暗压、按钮形变、形态变化的加载器与低振幅 SVG 波浪播放进度；拖动时波浪自动平复，减少动态效果时静态降级。滚动顶栏通过 0–56px 距离连续融合页面与 raised surface。
+- 已有 UI/UX 兼容修订仍保留；补充自动化测试。私有后端、Android WebView 和不同浏览器的真实触摸手感仍需实际设备验收。
+
+
 > **v1.28.4**：**歌曲条新增「播放 MV」按钮 + 播放页「更多」新增「歌曲百科」入口**。
 > · **播放 MV**：歌曲条右侧（时长左边）出现 `smart_display` 图标，**仅当该曲有 MV 时显示**（歌曲数据新增 `mv` 字段，服务端 `_norm_song` 与前端 `ncmSong` 都补上）。点击后全屏浮层播放：`/ncm/mv/url?id=&r=1080` 解析地址（上游没有 1080 档会**降级**返回，响应里的 `r` 是实际档），直链实测 `206 + video/mp4`；播放 MV 时**自动暂停音乐**，关闭后**恢复原播放状态**（`Esc` 或点空白处也能关）。
 > · **歌曲百科**：播放页右上角「更多」→「歌曲百科」，弹窗展示封面/歌名/歌手/专辑 + 章节内容。数据来自新增的本地端点 `GET /song/wiki?id=`：上游 `/song/wiki/info` 是**页面级拼装结构**（`blocks[].blockInfo.{blockName,desc,wikiSubElementVos[].{title,wikiSubMetaVos[].text}}`），前端直接解析既脆又难读，服务端归一化成 `{name,artist,album,cover,sections:[{name,fields:[[标题,值]],desc}]}` 并缓存 7 天。实测「海阔天空」返回 2 章节（创作信息 / 基本信息）、20 个字段、百科正文完整。

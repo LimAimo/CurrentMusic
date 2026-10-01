@@ -518,7 +518,7 @@ async function openFull() {
   };
   ov.querySelector('#plQueue').onclick = openQueue;
   const seek = ov.querySelector('#plSeek');
-  mountWavyTrack(ov.querySelector('#plSeekbar'), seek);
+  mountWavyTrack(ov.querySelector('#plSeekbar'), seek, player);
   // 波形控制器：数据来自真实频谱（wave.read），进度来自 posMs/durMs
   // （投屏时这两个值来自设备上报，直接读 audio 会是 0）
   const canvas = ov.querySelector('#plWaveCanvas');

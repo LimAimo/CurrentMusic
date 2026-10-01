@@ -1,7 +1,7 @@
 # CurrentMusic
 
 > 一个自用的 Android 音乐播放器：Material You 界面、自建账号体系、超清母带音质，还有多人「一起听」。
-> 前端是一份**没有框架的原生 JavaScript 单页应用**，跑在 Java WebView 壳里；界面用 MDUI 2（Material Design 3）。
+> 前端是一份**没有框架的原生 JavaScript 单页应用**，跑在 Java WebView 壳里；界面基于 MDUI 2，并提供 Material 3 Expressive、简约玻璃等主题。
 
 ![version](https://img.shields.io/badge/version-1.28.4-6750A4)
 ![android](https://img.shields.io/badge/Android-7.0%2B-34A853)
@@ -133,6 +133,10 @@ npm run preview         # 本地静态预览：http://127.0.0.1:4173/
 
 > 本地预览只运行**前端静态文件**，不会自动启动服务端。首次打开可在「设置 → 服务器地址」配置你自己的 CurrentMusic 后端；后端需允许当前网页来源（CORS），或通过同源代理访问。未配置后端时可预览界面，但登录、音源代理、歌单、多人同听等联网功能不可用。
 > 前端修订内容和真机/后端待验证项参见 [UI/UX 修订说明](docs/UI_UX_CHANGELOG.md)。
+
+**当前开发分支的 Web / MD3E 说明：** 普通浏览器不显示 Android 安装包、Native DLNA、原生下载目录或系统 WebView 设置；网页更新以实际部署的资源指纹为准，提示刷新页面而不是下载 APK。进入「设置 → 外观 → 界面风格」选择 **Material 3 Expressive** 可体验分层暗色、变形加载、波浪播放进度和滚动融合顶栏。输入/按钮点击没有浏览器蓝色高亮，键盘导航仍保留主题色焦点。浏览器媒体控制（MediaSession）不受影响。
+
+本地编译运行仍是 `cd web && npm install && npm test && npm run build && npm run preview`。此开发变更未修改 Android 版本号；APK 发版时请另行更新版本并完成真机测试。
 
 打包 APK（需要 JDK 17 与 Android SDK，build-tools 34）：
 
