@@ -2,7 +2,7 @@
 
 基于网易云音乐 SVIP 自建音源自建账号体系的 Android 音乐应用。MDUI 2（Material Design 3）设计语言。
 
-![version](https://img.shields.io/badge/version-1.28.1-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
+![version](https://img.shields.io/badge/version-1.28.2-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
 
 > **v1.28.0**：**字体大小改由 App 自己控制（不跟随系统）+ 设置页可调、带实时预览**。
 > · **不跟随系统字体大小**：Android WebView 显式固定 `textZoom=100`（默认值虽为 100，但部分
