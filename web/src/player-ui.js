@@ -1,4 +1,5 @@
 import { isAndroidApp, canNativeDownload } from './platform.js';
+import { mountWavyTrack } from './expressive.js';
 // 播放器 UI：底部迷你条 + 全屏播放页（封面/歌词/进度/音质/点赞/收藏/加入歌单）。
 import { mdui } from './md.js';
 import { createWaveform, WAVE_STYLE } from './waveform.js';
@@ -517,6 +518,7 @@ async function openFull() {
   };
   ov.querySelector('#plQueue').onclick = openQueue;
   const seek = ov.querySelector('#plSeek');
+  mountWavyTrack(ov.querySelector('#plSeekbar'), seek);
   // 波形控制器：数据来自真实频谱（wave.read），进度来自 posMs/durMs
   // （投屏时这两个值来自设备上报，直接读 audio 会是 0）
   const canvas = ov.querySelector('#plWaveCanvas');

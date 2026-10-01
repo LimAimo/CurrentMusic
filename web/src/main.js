@@ -4,9 +4,11 @@ import 'mdui/mdui.css';
 import '@material-design-icons/font/outlined.css';
 import './app.css';
 import './ui-overhaul.css';
+import './expressive.css';
 import { auth, settings, setAuthExpiredHandler, warmDecorScales } from './api.js';
 import { toast, esc, initRipple, bootColorScheme, bootFontScale, initImageFade } from './ui.js';
 import { initAccessibleControls } from './ux-controls.js';
+import { initExpressive } from './expressive.js';
 import { isAndroidApp, canNativeInsets } from './platform.js';
 import { checkUpdate } from './update.js';
 import { initPullToRefresh } from './ptr.js';
@@ -209,6 +211,7 @@ function boot() {
   document.getElementById('topBack').onclick = navigateBack;
   try { history.scrollRestoration = 'manual'; } catch { /* 旧版 WebView 不支持 */ }
   initAccessibleControls(); // 动态页面补齐键盘操作、焦点和可访问名称
+  initExpressive(); // 只增强 MD3E：变形加载指示器与切换场景兼容
 
   // MD3 top app bar：内容滚动时切换 surface 层级 + elevation
   const outEl = out();
