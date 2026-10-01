@@ -65,8 +65,8 @@ test('MD3E 有深色暗压、波浪进度、变形加载及 reduced-motion 退�
 
 test('MD3E 顶栏初始与页面同色，滚动连续插值，小屏安全高度包含 visualViewport', async () => {
   const [main, css, modal] = await Promise.all([src('src/main.js'), src('src/expressive.css'), src('src/ui-overhaul.css')]);
-  assert.match(main, /Math\.min\(1, outEl\.scrollTop \/ 56\)/);
+  assert.match(main, /\(outEl\.scrollTop - 2\) \/ 28/);
   assert.match(main, /window\.visualViewport\.addEventListener\('resize'/);
-  assert.match(css, /var\(--cm-e-mid\) var\(--cm-scroll-blend\), var\(--cm-e-bg\)/);
+  assert.match(css, /--cm-header-blur/);
   assert.match(modal, /var\(--cm-vvh, 100dvh\)/);
 });

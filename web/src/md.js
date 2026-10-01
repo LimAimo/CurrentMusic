@@ -20,6 +20,15 @@ export function adaptiveDialog(options = {}) {
     body: `<div class="cm-dialog-scroll">${body}</div>`,
   });
   diag.classList.add('cm-adaptive-dialog');
+  // 等 Web Component 布局完成后检测正文高度；长内容手机端自动停靠到底部。
+  const updateLayout = () => {
+    if (!diag.isConnected) return;
+    const viewport = window.visualViewport?.height || window.innerHeight;
+    const scroll = diag.querySelector('.cm-dialog-scroll');
+    if (scroll) diag.classList.toggle('cm-dialog-long', scroll.scrollHeight > Math.min(420, viewport * .56));
+  };
+  requestAnimationFrame(() => requestAnimationFrame(updateLayout));
+  diag.addEventListener('open', updateLayout);
   return diag;
 }
 export const mdui = { snackbar, dialog: adaptiveDialog, alert, confirm, prompt, setColorScheme, setTheme, getColorFromImage };

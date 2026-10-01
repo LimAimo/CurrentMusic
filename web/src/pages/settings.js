@@ -31,14 +31,15 @@ export function themeName() {
 export async function render(el) {
   const u = auth.user || {};
   const isApp = isAndroidApp();
+  const isGlass = uiPresetKey() === 'frost' || uiPresetKey() === 'glass';
   el.innerHTML = `
     <div class="cm-sec-head"><h2>外观</h2></div>
     <div class="cm-setting-list">
       <div class="cm-setting" id="scheme"><span class="material-icons-outlined">palette</span>配色方案<i>${esc((COLOR_SCHEMES.find(s => s.key === getColorSchemeKey()) || {}).label || '动态取色')}</i></div>
       <div class="cm-setting" id="theme"><span class="material-icons-outlined">dark_mode</span>外观主题<i>${themeName()}</i></div>
       <div class="cm-setting" id="uiPreset"><span class="material-icons-outlined">auto_awesome</span>界面风格<i>${esc(uiPresetName())}</i></div>
-        <div class="cm-setting" id="bgImage"><span class="material-icons-outlined">wallpaper</span>背景图片<i>${bgImage() ? '已自定义' : '默认'}</i></div>
-        <div class="cm-setting" id="glassFx"><span class="material-icons-outlined">blur_on</span>玻璃效果<i>${glassTint() == null ? '默认' : '已自定义'}</i></div>
+        ${isGlass ? `<div class="cm-setting" id="bgImage"><span class="material-icons-outlined">wallpaper</span>背景图片<i>${bgImage() ? '已自定义' : '默认'}</i></div>
+        <div class="cm-setting" id="glassFx"><span class="material-icons-outlined">blur_on</span>玻璃效果<i>${glassTint() == null ? '默认' : '已自定义'}</i></div>` : ''}
         <div class="cm-setting" id="waveStyle"><span class="material-icons-outlined">graphic_eq</span>波形样式<i>${(WAVE_STYLES.find(x => x.key === waveStyle()) || WAVE_STYLES[0]).name}</i></div>
         <div class="cm-setting" id="waveTilt"><span class="material-icons-outlined">trending_up</span>频谱倾斜<i>${waveTilt() <= 0 ? '关闭' : waveTilt().toFixed(1) + ' dB/oct'}</i></div>
         <div class="cm-setting" id="fontScale"><span class="material-icons-outlined">format_size</span>字体大小<i>${esc((FONT_SCALES.find(x => x.key === getFontScaleKey()) || {}).label || '标准')}</i></div>
@@ -133,7 +134,7 @@ export async function render(el) {
         <div class="cm-more-chips">${picks.map(p =>
           `<mdui-chip ${p.key === cur ? 'selected' : ''} data-k="${p.key}"><i class="cm-swatch ${p.swatch}"></i>${p.name}</mdui-chip>`).join('')}</div>
         <div class="cm-more-s" style="margin-top:10px">${esc((UI_PRESETS.find(p => p.key === cur) || {}).desc || '')}</div>
-        <div class="cm-more-s" style="margin-top:6px">「简约玻璃」把玻璃只用在顶栏/底栏/弹窗等浮层，内容卡片走磨砂白 + 发丝线、不用投影。旧版系统会自动降级为半透明纯色，不影响使用。Material 3 Expressive 包含动态配色、波浪进度与表达性动效。</div>
+        <div class="cm-more-s" style="margin-top:6px">不同风格各自保存设置；Material 3 Expressive 使用扁平列表、动态配色和媒体动效。</div>
       </div>`,
       actions: [{ text: '关闭' }],
     });
@@ -149,7 +150,7 @@ export async function render(el) {
     }, 0);
   };
   // ---- 背景图片：URL 或本地上传（存 localStorage，dataURL 过大时拒绝）----
-  el.querySelector('#bgImage').onclick = () => {
+  el.querySelector('#bgImage')?.addEventListener('click', () => {
     const cur = bgImage();
     const diag = mdui.dialog({
       headline: '背景图片',
@@ -205,10 +206,10 @@ export async function render(el) {
         fi.click();
       };
     }, 0);
-  };
+  });
 
   // ---- 玻璃效果：模糊 + 浓度，拖动即时生效（关闭时才重建折射透镜）----
-  el.querySelector('#glassFx').onclick = () => {
+  el.querySelector('#glassFx')?.addEventListener('click', () => {
     let blur = glassBlur(), tint = glassTint();
     const tintDef = 0.58;
     const diag = mdui.dialog({
@@ -246,7 +247,7 @@ export async function render(el) {
         setGlass({ tint });
       };
     }, 0);
-  };
+  });
 
   el.querySelector('#waveTilt').onclick = () => {
     let cur = waveTilt();

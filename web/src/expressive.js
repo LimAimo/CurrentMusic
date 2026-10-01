@@ -23,38 +23,50 @@ export function initExpressive() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// Canvas 不参与：用 SVG 路径叠加在真实 range 下面，拖动期间自动收敛为直线，
-// 媒体进度和触摸目标仍由原生 range 负责。
+// 波形始终按 CSS 像素计算周期，避免伸缩 SVG viewBox 时被拉成模糊长波。
+export function buildWavyPath(width, progress, amplitude, phase = 0) {
+  const end = Math.max(0, Math.min(width, width * progress));
+  if (end <= 0) return '';
+  const step = 3; // 高 DPI 下采样足够细，但不让低端手机每帧产生几千个点
+  let path = 'M 0 12';
+  for (let x = step; x < end; x += step) {
+    const taper = Math.min(1, x / 12, (end - x) / 12);
+    path += ` L ${x.toFixed(1)} ${(12 + Math.sin(x * Math.PI / 15 - phase) * amplitude * taper).toFixed(2)}`;
+  }
+  path += ` L ${end.toFixed(1)} 12`;
+  return path;
+}
+
+// Canvas 不参与：SVG 只画已播放的波浪；暂停、拖动和无障碍模式恢复直线。
 export function mountWavyTrack(bar, seek, player) {
   if (!bar || !seek || bar.querySelector('.cm-wavy-track')) return;
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
-  svg.setAttribute('viewBox', '0 0 1000 24');
   svg.setAttribute('preserveAspectRatio', 'none');
   svg.setAttribute('aria-hidden', 'true');
   svg.classList.add('cm-wavy-track');
   const path = document.createElementNS(ns, 'path');
   svg.appendChild(path);
   bar.appendChild(svg);
-  let phase = 0, last = 0, frame = 0;
+  let phase = 0, last = 0, frame = 0, width = 0;
+  const measure = () => {
+    width = Math.max(1, bar.clientWidth);
+    svg.setAttribute('viewBox', `0 0 ${width} 24`);
+  };
+  measure();
+  const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+  observer?.observe(bar);
   function draw(ts) {
-    if (!bar.isConnected) return;
+    if (!bar.isConnected) { observer?.disconnect(); cancelAnimationFrame(frame); return; }
     frame = requestAnimationFrame(draw);
-    const playing = player?.isPlaying?.() && document.visibilityState === 'visible';
-    if (ts - last < (playing ? 42 : 250)) return; // 播放 ~24fps；暂停/后台 4fps。
+    const playing = !!player?.isPlaying?.() && document.visibilityState === 'visible';
+    if (ts - last < (playing ? 33 : 125)) return;
     last = ts;
     const amount = Math.max(0, Math.min(1, Number(seek.value || 0) / 100));
-    const end = Math.max(0, amount * 1000);
-    const amp = !active() || reduced() || seek.dataset.drag ? 0 : 3.1;
-    if (active() && !reduced() && playing && !seek.dataset.drag) phase += .16;
-    const steps = Math.max(1, Math.ceil(end / 8));
-    let d = 'M 0 12';
-    for (let i = 1; i <= steps; i++) {
-      const x = end * i / steps;
-      d += ' L ' + x.toFixed(1) + ' ' + (12 + Math.sin(x * .068 - phase) * amp).toFixed(2);
-    }
-    path.setAttribute('d', d);
+    const animated = active() && !reduced() && !seek.dataset.drag && playing && !document.documentElement.hasAttribute('data-cm-wave-off');
+    const amp = animated ? 4.8 : 0;
+    if (animated) phase += .18;
+    path.setAttribute('d', buildWavyPath(width, amount, amp, phase));
   }
   frame = requestAnimationFrame(draw);
-  svg.addEventListener('remove', () => cancelAnimationFrame(frame), { once: true });
 }

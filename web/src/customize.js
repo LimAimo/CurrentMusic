@@ -14,6 +14,18 @@
 
 
 // 播放页波形样式（纯指示，不表达进度）：bars（默认）| wave | capsule
+// 音乐频谱独立于波浪播放进度；用户可随时关闭，默认启用。
+const WAVE_ENABLED_KEY = 'cm.waveEnabled';
+export function waveEnabled() { return localStorage.getItem(WAVE_ENABLED_KEY) !== '0'; }
+export function syncWavePreference() {
+  document.documentElement.toggleAttribute('data-cm-wave-off', !waveEnabled());
+}
+export function setWaveEnabled(on) {
+  localStorage.setItem(WAVE_ENABLED_KEY, on ? '1' : '0');
+  syncWavePreference();
+  document.dispatchEvent(new Event('cm-wavecfg'));
+}
+
 const WAVE_KEY = 'cm.waveStyle';
 const WAVE_KEYS = ['bars', 'wave', 'capsule'];
 
@@ -39,7 +51,7 @@ export function setWaveTilt(v) {
 
 export function waveStyle() {
   const v = localStorage.getItem(WAVE_KEY);
-  return WAVE_KEYS.indexOf(v) >= 0 ? v : 'bars';
+  return WAVE_KEYS.indexOf(v) >= 0 ? v : (document.documentElement.hasAttribute('data-ui-preset') ? 'bars' : 'capsule');
 }
 
 /** 设置波形样式并即时通知播放页（若正开着播放页，会立刻换成新样式）。 */
@@ -91,12 +103,13 @@ function setOrRemove(el, prop, value) {
  */
 export function applyCustomize({ rebuild = false } = {}) {
   const el = document.documentElement;
-  const bg = bgImage();
+  const glassMode = ['frost', 'glass'].includes(el.getAttribute('data-ui-preset'));
+  const bg = glassMode ? bgImage() : '';
   // url("...") 里可能出现引号/括号，用 CSS 转义包一层，避免拼进 url() 后被截断
   setOrRemove(el, '--cm-bg-image', bg ? `url("${bg.replace(/["\\]/g, '\\$&')}")` : null);
-  setOrRemove(el, '--frs-lens-blur', String(glassBlur()));
+  setOrRemove(el, '--frs-lens-blur', glassMode ? String(glassBlur()) : null);
   const t = glassTint();
-  setOrRemove(el, '--frs-alpha', t == null ? null : String(t));
+  setOrRemove(el, '--frs-alpha', !glassMode || t == null ? null : String(t));
   if (rebuild) {
     try { document.dispatchEvent(new Event('cm-uipreset')); } catch (e) { /* 忽略 */ }
   }
@@ -119,3 +132,6 @@ export function resetGlass() {
   localStorage.removeItem(TINT_KEY);
   applyCustomize({ rebuild: true });
 }
+
+// 切换主题时重新应用对应的专属变量，保留其他主题用户值但不跨主题生效。
+document.addEventListener('cm-uipreset', () => applyCustomize());
