@@ -187,3 +187,23 @@ mdui-dialog.cm-adaptive-dialog :is([slot="action"], [slot="actions"]) { flex-shr
 .cm-web-update-hero { width: 64px; height: 64px; margin: 6px auto 15px; border-radius: 22px; display: grid; place-items: center; color: var(--cm-primary); background: color-mix(in srgb, var(--cm-primary) 14%, transparent); }
 .cm-web-update-hero .material-icons-outlined { font-size: 32px; }
 .cm-web-update p { margin: 6px 0 12px; }
+
+/* 安全视口内单层滚动：外壳固定，正文自动缩放，按钮区始终在视区内。 */
+mdui-dialog.cm-adaptive-dialog { --cm-dialog-viewport: var(--cm-vvh, 100dvh); }
+mdui-dialog.cm-adaptive-dialog::part(panel) {
+  max-width: calc(100vw - 16px); max-height: calc(var(--cm-dialog-viewport) - 20px - env(safe-area-inset-bottom));
+  overflow: hidden; contain: layout; 
+}
+mdui-dialog.cm-adaptive-dialog .cm-dialog-scroll {
+  box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0;
+  max-height: calc(var(--cm-dialog-viewport) - 170px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+mdui-dialog.cm-adaptive-dialog .cm-dialog-scroll :is(mdui-slider, input[type="range"], mdui-text-field) {
+  display: block; width: 100%; min-width: 0; box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  mdui-dialog.cm-adaptive-dialog::part(panel) { width: calc(100vw - 24px); }
+  mdui-dialog.cm-adaptive-dialog .cm-dialog-scroll { font-size: clamp(12px,3.5vw,14px); }
+  mdui-dialog.cm-adaptive-dialog .cm-more-row { min-width: 0; }
+}

@@ -136,3 +136,47 @@
   :root:not([data-ui-preset]) .cm-more-tab { font-size: 12px; padding-inline: 3px; }
   :root:not([data-ui-preset]) :is(.cm-quick,.cm-card,.cm-setting) { contain: layout style; }
 }
+
+/* 原生式 MD3E：低层次纯色、透明形态变化，弹窗只渐入渐出。 */
+:root:not([data-ui-preset]) mdui-dialog.cm-adaptive-dialog::part(panel) {
+  border: 0; border-radius: 28px; background: var(--cm-e-mid);
+  box-shadow: 0 12px 32px rgba(0,0,0,.12);
+  transform: none !important; transition: opacity 180ms ease-out !important;
+  animation: cm-dialog-fade-in 180ms ease-out both;
+}
+:root.mdui-theme-dark:not([data-ui-preset]) mdui-dialog.cm-adaptive-dialog::part(panel) {
+  border: 0; box-shadow: 0 14px 34px rgba(0,0,0,.26);
+}
+:root:not([data-ui-preset]) mdui-dialog.cm-adaptive-dialog:not([open])::part(panel) {
+  opacity: 0; animation: cm-dialog-fade-out 160ms ease-in both;
+}
+@keyframes cm-dialog-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cm-dialog-fade-out { from { opacity: 1; } to { opacity: 0; } }
+:root:not([data-ui-preset]) .cm-more-tab {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--cm-e-outline);
+  border-radius: 999px !important; min-height: 40px; padding: 6px 8px;
+  transition: background 160ms ease-out, color 160ms ease-out, transform 160ms ease-out !important;
+}
+:root:not([data-ui-preset]) .cm-more-tabs { background: transparent; gap: 6px; padding: 0; }
+:root:not([data-ui-preset]) .cm-more-tab[aria-selected="true"] {
+  background: var(--cm-e-tint); border-color: transparent; color: var(--mdui-color-on-surface);
+}
+:root:not([data-ui-preset]) .cm-more-tab.cm-pressed {
+  transform: scale(.94); background: var(--cm-primary); color: var(--mdui-color-on-primary);
+}
+:root:not([data-ui-preset]) :is(mdui-button, mdui-chip, .pl-lyric-mark, .cm-search-go, .cm-retry) {
+  border-radius: 999px !important;
+  --mdui-comp-button-container-shape: 999px; --mdui-comp-chip-container-shape: 999px;
+}
+@media (max-width: 600px) {
+  :root:not([data-ui-preset]) .cm-more-tabs { gap: 4px; }
+  :root:not([data-ui-preset]) .cm-more-tab { font-size: 11.5px; min-height: 38px; padding: 4px 2px; }
+  :root:not([data-ui-preset]) mdui-dialog.cm-dialog-long::part(panel) {
+    position: fixed; inset: auto 8px max(8px, env(safe-area-inset-bottom)) 8px;
+    width: auto; margin: 0 auto; max-height: min(88dvh, calc(var(--cm-vvh, 100dvh) - 12px - env(safe-area-inset-top)));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-ui-preset]) mdui-dialog.cm-adaptive-dialog::part(panel) { animation: none !important; transition: none !important; }
+}
