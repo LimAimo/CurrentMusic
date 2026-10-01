@@ -2,8 +2,19 @@
 
 基于网易云音乐 SVIP 自建音源自建账号体系的 Android 音乐应用。MDUI 2（Material Design 3）设计语言。
 
-![version](https://img.shields.io/badge/version-1.24.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
+![version](https://img.shields.io/badge/version-1.24.1-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
 
+> **v1.24.1**：**紧急修复——v1.24.0 的首页打不开**（`页面加载失败: bannerHTML is not defined`）。
+> 原因是我给首页改版时用「字符串定位 + 切片替换」动模板，而首页里**两处 `el.innerHTML` 都以同一段
+> 模板开头**，定位命中了骨架屏那处，把中间的数据请求段（`bannerHTML`/`daily`/`recForYou`/`jobs` 等）
+> 整段切掉，模板却还在引用它们 → 首屏渲染即 ReferenceError。
+> · **修复**：按原文件重建首页（数据逻辑完整保留），并改正了动线重排。
+> · **防复发**：`tools/check-js-refs.py` 增加第二道检查——**模板串 `${...}` 里的裸标识符是否真有声明**，
+>   已接入 CI。这类"声明被删、引用还在"的问题 esbuild 与首道检查都查不出（首道只管跨模块 import），
+>   必须靠它兜。为避免误报，口径收窄到"整个插值恰好是一个裸标识符"（`${foo}` 而非 `${foo.bar}`），
+>   并用**模拟事故数据回归验证**：删掉那行声明后必须报 `home.js:63 bannerHTML`，恢复后必须干净。
+> · 同时补上逗号连声明（`const h = 1, m = 2`）等作用域识别盲区——它们曾是误报来源（实测从 1376 条
+>   误报收敛到 0）。
 > **v1.24.0**：**首页/发现按听歌习惯重排 + 播放抗卡顿 + 播放页视觉与动态取色**。
 > · **首页**改成「打开就能听」的动线：**继续播放**提到首屏第一位，新增**一键开听**快捷行
 >   （私人 FM / 心动模式 / 每日推荐 / 我的歌单），每日推荐与猜你喜欢居中，排行榜与一起听下沉为工具区；
