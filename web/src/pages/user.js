@@ -138,10 +138,6 @@ function renderAuth(el) {
       <mdui-button variant="tonal" full-width id="altInternal">
         <span class="material-icons-outlined">key</span>&nbsp;内部账户登录
       </mdui-button>
-      ${!(window.NativeApi && window.NativeApi.versionCode) ? `
-        <a class="cm-auth-apk" id="dlApk" href="${esc(settings.base + '/download/latest')}">
-          <span class="material-icons-outlined">android</span>下载安卓版 APP（支持后台播放）
-        </a>` : ''}
       <div class="cm-auth-note" id="authNote">注册需完成手机或邮箱验证（验证码 5 分钟内有效）；本服务为自建音乐社区，数据存储于服务器管理员处。</div>
     </div>`;
 

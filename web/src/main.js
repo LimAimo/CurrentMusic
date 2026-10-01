@@ -7,6 +7,7 @@ import './ui-overhaul.css';
 import { auth, settings, setAuthExpiredHandler, warmDecorScales } from './api.js';
 import { toast, esc, initRipple, bootColorScheme, bootFontScale, initImageFade } from './ui.js';
 import { initAccessibleControls } from './ux-controls.js';
+import { isAndroidApp, canNativeInsets } from './platform.js';
 import { checkUpdate } from './update.js';
 import { initPullToRefresh } from './ptr.js';
 import { engineChrome, engineOutdated } from './version.js';
@@ -188,7 +189,7 @@ function boot() {
   bootColorScheme();   // 配色方案（默认动态取色，取色随播放封面变化）
   bootFontScale();     // 字体大小（默认标准；不跟随系统字号，见 ui.js FONT_SCALES）
   // 原生窗口 insets（env(safe-area-inset-*) 在多数 WebView 上恒为 0，用桥值兜底）
-  if (window.NativeApi && window.NativeApi.insets) {
+  if (canNativeInsets()) {
     try {
       const i = JSON.parse(window.NativeApi.insets());
       const rt = document.documentElement.style;
@@ -209,16 +210,6 @@ function boot() {
   try { history.scrollRestoration = 'manual'; } catch { /* 旧版 WebView 不支持 */ }
   initAccessibleControls(); // 动态页面补齐键盘操作、焦点和可访问名称
 
-  // 网页版顶栏「下载安卓版 APP」入口（App 内有 NativeApi，不渲染）
-  if (!(window.NativeApi && window.NativeApi.versionCode)) {
-    const dl = document.createElement('a');
-    dl.id = 'dlApkTop';
-    dl.className = 'cm-dl-apk-top';
-    dl.title = '下载安卓版 APP';
-    dl.innerHTML = '<span class="material-icons-outlined">android</span><span>下载 APP</span>';
-    dl.href = settings.base + '/download/latest';
-    document.getElementById('topAction').before(dl);
-  }
   // MD3 top app bar：内容滚动时切换 surface 层级 + elevation
   const outEl = out();
   outEl.addEventListener('scroll', () => {
@@ -243,7 +234,7 @@ function boot() {
   setAuthExpiredHandler(() => toast('登录已失效，请重新登录'));
 
   // 旧版渲染引擎一次性提示（引导更新 WebView，更新后可恢复最佳效果）
-  if (engineOutdated() && !sessionStorage.getItem('cm.engineHint')) {
+  if (isAndroidApp() && engineOutdated() && !sessionStorage.getItem('cm.engineHint')) {
     sessionStorage.setItem('cm.engineHint', '1');
     setTimeout(() => toast(`当前系统 WebView 较旧（Chromium ${engineChrome()}），建议在应用商店更新以获得最佳体验`), 4000);
   }

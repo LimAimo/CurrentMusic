@@ -1,3 +1,4 @@
+import { canDlna } from './platform.js';
 // DLNA 投屏：搜索局域网渲染器并把音频交给设备播放。
 //
 // 原生侧（MainActivity.Bridge → Dlna.java）负责 SSDP 组播与 AVTransport SOAP，
@@ -36,8 +37,7 @@ let patched = false;
 let ticker = null;
 
 /** 原生桥是否可用（浏览器里没有）。 */
-export const castSupported = () => typeof window.NativeApi !== 'undefined'
-  && typeof window.NativeApi.dlnaDiscover === 'function';
+export const castSupported = canDlna;
 
 export const isCasting = () => S.casting;
 

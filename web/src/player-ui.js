@@ -1,3 +1,4 @@
+import { isAndroidApp, canNativeDownload } from './platform.js';
 // 播放器 UI：底部迷你条 + 全屏播放页（封面/歌词/进度/音质/点赞/收藏/加入歌单）。
 import { mdui } from './md.js';
 import { createWaveform, WAVE_STYLE } from './waveform.js';
@@ -667,10 +668,10 @@ function openMoreDrawer() {
         <div><div class="cm-more-t">查看歌曲详情</div><div class="cm-more-s">音质档位 / 副歌时间 / 红心数 / 创作者 / 百科 / 相似歌曲 / 乐谱</div></div>
         <span class="material-icons-outlined">chevron_right</span>
       </div>
-      <div class="cm-more-sec">下载到本机</div>
+      <div class="cm-more-sec">${isAndroidApp() ? '下载到本机' : '浏览器下载'}</div>
       <div class="cm-more-chips" id="chipsDl">${QUALITY_TIERS.map(t =>
         `<mdui-chip data-g="dl" data-k="${t.key}" ${t.key === settings.quality ? 'selected' : ''}>${t.label}</mdui-chip>`).join('')}</div>
-      <div class="cm-more-s" style="margin-top:6px">目录：Music/${esc(localStorage.getItem('cm.downloadDir') || 'CurrentMusic')}（可在「设置」修改）</div>
+      ${isAndroidApp() ? `<div class="cm-more-s" style="margin-top:6px">目录：Music/${esc(localStorage.getItem('cm.downloadDir') || 'CurrentMusic')}</div>` : `<div class="cm-more-s" style="margin-top:6px">浏览器将按自身下载设置保存，具体位置由浏览器决定。</div>`}
       </div>
     </div>`,
     actions: [{ text: '关闭' }],
@@ -756,7 +757,7 @@ async function doDownload(level) {
     const ext = (info.type || 'mp3').toLowerCase();
     const name = `${m.name} - ${m.artists}.${ext}`.replace(/[\\/:*?"<>|]/g, '_');
     const dir = localStorage.getItem('cm.downloadDir') || 'CurrentMusic';
-    if (window.NativeApi && window.NativeApi.download) {
+    if (canNativeDownload()) {
       window.NativeApi.download(info.url, name, dir);
     } else {
       window.open(info.url, '_blank');
