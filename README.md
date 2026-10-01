@@ -2,8 +2,20 @@
 
 基于网易云音乐 SVIP 自建音源自建账号体系的 Android 音乐应用。MDUI 2（Material Design 3）设计语言。
 
-![version](https://img.shields.io/badge/version-1.25.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
+![version](https://img.shields.io/badge/version-1.26.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
 
+> **v1.26.0**：**发现页默认「音乐」+ TAB 切换动画 + Pad 比例修正**。
+> · **默认 TAB 改为「音乐」**（发现页的主体是找歌）。仍保留会话记忆：手动切到「用户/帖子」后，
+>   本次会话内再进发现页会回到你选的那个；也支持深链 `#/square?tab=users`。
+>   顺带修掉一个静默兜底：以前传入非法 TAB 值会悄悄落到「用户」，现在回落默认值。
+> · **TAB 切换过渡动画**：内容面板按切换方向**左右轻滑 14px + 淡入**（200ms，
+>   `cubic-bezier(.2,0,0,1)`），并**回到顶部**——否则会停在上一个 TAB 的滚动位置；
+>   平板上三颗 TAB 不再各占 1/3 屏（限宽 168px 居中），点了有按压缩放反馈。
+>   动画在 `prefers-reduced-motion` 下自动关闭；结束后不留 `transform`，
+>   避免形成新的包含块影响内部 fixed 元素定位。
+> · **Pad 比例修正**：宽屏下内容列限宽居中（1080px，≥1200px 为 1180px），
+>   网格由固定列数改为 `auto-fill`（≥900px 时最小 160px）——原先固定 6 列在 1366px 上
+>   会把封面撑到 200px+，与其它卡片比例失衡；横滑卡片在平板上从 150px 提到最大 168px。
 > **v1.25.0**：**首页收纳——「一键开听」置顶，长列表默认折叠**。
 > · **一键开听**提到首页最上方（问候与公告横幅之下），打开就是"点一下就能听"的四个入口。
 > · **继续播放 / 猜你喜欢**首屏各只显示前 5 条，下方给一条「查看全部（还有 N 首）」；
