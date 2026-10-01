@@ -43,36 +43,37 @@ export function loadingBar() {
   return `<div class="cm-loading"><mdui-circular-progress></mdui-circular-progress></div>`;
 }
 
-// ---------- MD3 涟漪（事件委托，零模板侵入） ----------
-
-const RIPPLE_SEL = [
-  '.cm-song', '.cm-quick', '.cm-setting', '.cm-qm-item', '.cm-pl-pick-item',
-  '.cm-plcard', '.cm-card', '.nav-ic', '.cm-mini-inner', '.cm-song-like',
-  '.cm-song-more', '.cm-plmenu', '.cm-bindbanner', '.pl-btn', '#topAction', '#topSearch', '.cm-dl-apk-top', '.cm-ucard',
-  '.pl-quality', '.pl-lyric-mode', '.cm-sec-more', '.cmt-del', '#cmtMore',
-  '.cm-ava-wrap', '.cmt-like', '.cmt-reply', '.cmt-floor-btn',
-  // 不含 mdui-chip 等影子 DOM 组件：光节点不进插槽会错位，且 mdui 自带涟漪
+// 所有页面的触控反馈：使用状态层，不插入绝对定位的涟漪节点，避免顶栏点击效果错位。
+// 通过 pointercancel / pointermove 防止滚动手势残留按压态；影子 DOM 组件使用自己的状态层。
+const PRESS_TARGETS = [
+  '#topSearch', '#topAction', '#topBack', '.cm-song', '.cm-quick', '.cm-setting',
+  '.cm-qm-item', '.cm-pl-pick-item', '.cm-plcard', '.cm-card', '.navItem',
+  '.cm-mini-inner', '.cm-mini-btn', '.cm-song-like', '.cm-song-more', '.cm-plmenu',
+  '.cm-bindbanner', '.pl-btn', '.pl-quality', '.pl-lyric-mode', '.cm-sec-more',
+  '.cm-ava-wrap', '.cmt-like', '.cmt-reply', '.cmt-floor-btn', '.cm-dislike',
 ].join(',');
-
+let pressing = null;
+function clearPress() {
+  if (pressing) pressing.el.classList.remove('cm-pressed');
+  pressing = null;
+}
 export function initRipple() {
   document.addEventListener('pointerdown', e => {
-    if (e.button !== 0) return;                 // 右键/中键不产生涟漪
-    const t = e.target.closest(RIPPLE_SEL);
-    if (!t || !e.isPrimary) return;
-    if (t.shadowRoot) return;                   // 影子 DOM 宿主：涟漪会落在错误位置
-    const r = t.getBoundingClientRect();
-    if (!r.width && !r.height) return;
-    const d = Math.max(r.width, r.height) * 2.2;
-    const rip = document.createElement('i');
-    rip.className = 'cm-rip';
-    rip.style.width = rip.style.height = d + 'px';
-    rip.style.left = (e.clientX - r.left - d / 2) + 'px';
-    rip.style.top = (e.clientY - r.top - d / 2) + 'px';
-    t.appendChild(rip);
-    // animationend 在部分内核/headless 下不触发，定时兜底清理
-    rip.addEventListener('animationend', () => rip.remove(), { once: true });
-    setTimeout(() => rip.remove(), 700);
+    if (!e.isPrimary || e.button !== 0) return;
+    const el = e.target.closest?.(PRESS_TARGETS);
+    if (!el || el.disabled || el.matches('[aria-disabled="true"], [inert]')) return;
+    clearPress();
+    pressing = { el, id: e.pointerId, x: e.clientX, y: e.clientY };
+    el.classList.add('cm-pressed');
   }, { passive: true });
+  document.addEventListener('pointermove', e => {
+    if (pressing && pressing.id === e.pointerId &&
+        Math.hypot(e.clientX - pressing.x, e.clientY - pressing.y) > 11) clearPress();
+  }, { passive: true });
+  for (const event of ['pointerup', 'pointercancel', 'scroll', 'contextmenu']) {
+    document.addEventListener(event, clearPress, { passive: true, capture: event === 'scroll' });
+  }
+  window.addEventListener('blur', clearPress);
 }
 
 // ---------- 封面取色（动态取色 / 渐变背景共用，带缓存） ----------

@@ -9,8 +9,8 @@ body { -webkit-user-select: text; user-select: text; -webkit-touch-callout: defa
 
 /* WCAG 可见焦点 / 触达面积：外观主题不能取消这些交互保障。 */
 :where(button, a, summary, input, select, textarea, [role="button"], [role="tab"]):focus-visible {
-  outline: 3px solid var(--mdui-color-primary, #6750a4);
-  outline-offset: 3px;
+  outline: 2px solid var(--cm-primary, #6750a4);
+  outline-offset: 2px;
 }
 :where(.pl-btn, .cm-song-like, .cm-song-more, .cm-mini-btn,
   #topBack, #topAction, #topSearch, .cm-dislike) { min-width: 44px; min-height: 44px; }
@@ -122,4 +122,64 @@ html[data-ui-preset="frost"] :is(.cm-card-sub, .cm-song-sub, .cm-sec-sub) {
   :where(.cm-page, .cm-card, .cm-song, .pl-btn, .cm-more-tab, .cm-mini-btn, .cm-dislike, .pl-lyric-mark) {
     animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important;
   }
+}
+
+/* 阶段 1 · 统一模态框 / 安全滚动：底部按钮不再被浏览器地址栏挡住。 */
+mdui-dialog.cm-adaptive-dialog {
+  --mdui-comp-dialog-container-shape: 28px;
+  width: min(100%, 560px);
+  max-width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overscroll-behavior: contain;
+}
+mdui-dialog.cm-adaptive-dialog::part(panel) {
+  box-sizing: border-box;
+  width: min(560px, calc(100vw - 24px));
+  max-height: min(90dvh, calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 28px;
+}
+mdui-dialog.cm-adaptive-dialog::part(body),
+mdui-dialog.cm-adaptive-dialog::part(content) { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.cm-dialog-scroll { min-height: 0; min-width: 0; width: 100%; max-height: calc(90dvh - 176px); overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.cm-dialog-scroll > * { min-width: 0; max-width: 100%; }
+.cm-dialog-scroll :is(.upd, .cm-more, .cm-queue, .upd-log, .upd-srcs) { min-width: 0; max-width: 100%; }
+.cm-dialog-scroll .upd-log { max-height: none; overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cm-dialog-scroll .upd-src-url { overflow-wrap: anywhere; }
+mdui-dialog.cm-adaptive-dialog :is([slot="action"], [slot="actions"]) { flex-shrink: 0; }
+@media (max-width: 600px) {
+  mdui-dialog.cm-adaptive-dialog::part(panel) { width: calc(100vw - 24px); max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+  .cm-dialog-scroll { max-height: calc(100dvh - 178px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+}
+/* 通用按压状态层：元素自身的背景变化，不再生成漂移到标题上的蓝色涟漪。 */
+:where(html, body, button, a, [role="button"], [role="tab"], mdui-button, mdui-chip) { -webkit-tap-highlight-color: transparent !important; }
+.cm-rip { display: none !important; }
+:where(.cm-song, .cm-quick, .cm-setting, .cm-qm-item, .cm-pl-pick-item, .cm-plcard, .cm-card,
+  .navItem, .cm-mini-inner, .cm-mini-btn, .cm-song-like, .cm-song-more, .pl-btn, .cm-dislike,
+  #topSearch, #topAction, #topBack) {
+  --cm-press-color: color-mix(in srgb, var(--cm-primary) 12%, transparent);
+  transition: background-color 170ms cubic-bezier(.2,0,0,1), transform 240ms cubic-bezier(.2,.8,.2,1), border-radius 240ms cubic-bezier(.2,.8,.2,1);
+  touch-action: manipulation;
+}
+:where(.cm-song, .cm-quick, .cm-setting, .cm-card, .cm-mini-inner, .navItem, .pl-btn,
+  #topSearch, #topAction, #topBack).cm-pressed {
+  background-color: var(--cm-press-color) !important;
+}
+:where(.cm-mini-btn, .pl-btn, #topSearch, #topAction, #topBack).cm-pressed { transform: scale(.94); }
+/* 搜索/设置/返回同一规格，避免 a 的行高使图标视觉中心偏移。 */
+#topActs { display: flex; align-items: center; gap: 4px; flex: none; }
+#topActs > :is(a, button), #topBack {
+  box-sizing: border-box; width: 48px; height: 48px; min-width: 48px; min-height: 48px;
+  margin: 0; padding: 0 !important; border: 0; border-radius: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Material Icons Outlined'; font-size: 25px; line-height: 1;
+  vertical-align: middle; text-decoration: none; color: inherit; background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+#topActs > :is(a, button):is(:focus, :active) { -webkit-tap-highlight-color: transparent; }
+@media (prefers-reduced-motion: reduce) {
+  .cm-dialog-scroll, .cm-pressed, #topActs > *, #topBack { animation: none !important; transition: none !important; }
 }
