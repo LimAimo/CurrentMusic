@@ -50,6 +50,7 @@ export function createWaveform(canvas, opts) {
   const rateOf = opts.rate || function () { return 48000; };   // 采样率：算每根柱的中心频率
   const want = opts.style || WAVE_STYLE;
   const style = STYLES.indexOf(want) >= 0 ? want : WAVE_STYLE;
+  const crisp = !document.documentElement.hasAttribute('data-ui-preset');
 
   const ctx = canvas.getContext('2d');
   let dpr = 1, cssW = 0, cssH = 0;
@@ -76,7 +77,7 @@ export function createWaveform(canvas, opts) {
     const rect = canvas.getBoundingClientRect();
     const w = Math.max(40, Math.round(rect.width));
     const h = Math.max(14, Math.round(rect.height));
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, 3);
     if (w === cssW && h === cssH && canvas.width) return;
     cssW = w; cssH = h;
     canvas.width = Math.round(w * dpr);
@@ -86,7 +87,7 @@ export function createWaveform(canvas, opts) {
     bars = style === 'wave'
       ? Math.max(28, Math.min(72, Math.round(w / 4.6)))
       : style === 'capsule'
-        ? Math.max(9, Math.min(20, Math.round(w / 22)))
+        ? crisp ? Math.max(24, Math.min(56, Math.round(w / 10))) : Math.max(9, Math.min(20, Math.round(w / 22)))
         : Math.max(24, Math.min(56, Math.round(w / 6.4)));
     bandLo = null;                        // 柱数变化 → 分箱需重建
     level = new Float32Array(bars);
@@ -254,10 +255,10 @@ export function createWaveform(canvas, opts) {
     const w = cssW, h = cssH;
     const n = bars;
     const slot = w / n;
-    const bw = Math.max(3, slot * 0.5);
+    const bw = crisp ? Math.max(3, slot * 0.52) : Math.max(3, slot * 0.5);
     const r = bw / 2;
     const maxH = h - 2;
-    const g = gradient();
+    const g = crisp ? ACCENT + '0.94)' : gradient();
     for (let i = 0; i < n; i++) {
       const v = hasData ? level[i] : 0;
       const bh = Math.max(bw, v * maxH);          // 停播时是一排圆点，形态干净

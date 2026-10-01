@@ -17,8 +17,12 @@
 // 音乐频谱独立于波浪播放进度；用户可随时关闭，默认启用。
 const WAVE_ENABLED_KEY = 'cm.waveEnabled';
 export function waveEnabled() { return localStorage.getItem(WAVE_ENABLED_KEY) !== '0'; }
+export function syncWavePreference() {
+  document.documentElement.toggleAttribute('data-cm-wave-off', !waveEnabled());
+}
 export function setWaveEnabled(on) {
   localStorage.setItem(WAVE_ENABLED_KEY, on ? '1' : '0');
+  syncWavePreference();
   document.dispatchEvent(new Event('cm-wavecfg'));
 }
 
@@ -47,7 +51,7 @@ export function setWaveTilt(v) {
 
 export function waveStyle() {
   const v = localStorage.getItem(WAVE_KEY);
-  return WAVE_KEYS.indexOf(v) >= 0 ? v : 'bars';
+  return WAVE_KEYS.indexOf(v) >= 0 ? v : (document.documentElement.hasAttribute('data-ui-preset') ? 'bars' : 'capsule');
 }
 
 /** 设置波形样式并即时通知播放页（若正开着播放页，会立刻换成新样式）。 */

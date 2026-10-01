@@ -207,3 +207,10 @@
 .pl-lyric-action { justify-content: flex-end; }
 .pl-waveform[hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .pl-lyric-hint { animation:none; } }
+
+/* 波浪关闭时直接呈现普通清晰进度条，频谱也收起，不占据原有高度。 */
+html[data-cm-wave-off] .pl-seekbar .cm-wavy-track { display: none !important; }
+:root:not([data-ui-preset])[data-cm-wave-off] .pl-seekbar .pl-fill { opacity: 1; }
+.pl-seekbar .cm-wavy-track { overflow: hidden !important; }
+:root:not([data-ui-preset]) .cm-wavy-track path { stroke-width: 3.25; }
+:root:not([data-ui-preset]) .pl-waveform canvas { filter: none !important; image-rendering: auto; }

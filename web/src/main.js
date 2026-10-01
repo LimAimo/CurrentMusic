@@ -18,7 +18,7 @@ import { initPlayerUI } from './player-ui.js';
 import { initMv } from './mv.js';
 import { initCast } from './cast.js';
 import { bootUiPreset } from './uipreset.js';
-import { applyCustomize } from './customize.js';
+import { applyCustomize, syncWavePreference } from './customize.js';
 import { initGlass } from './glass.js';
 import { initNavDrop } from './navdrop.js';
 import { applyTheme } from './pages/settings.js';
@@ -244,6 +244,7 @@ function boot() {
   initPullToRefresh(() => router());
 
   bootUiPreset();            // UI 皮肤：把预设属性打到 <html>（默认不生效）
+  syncWavePreference(); // 频谱及波浪进度开关：启动时应用，避免首次播放闪烁
   applyCustomize();          // 个性化：自定义背景图 + 玻璃效果值（写到 <html> 内联）
   initGlass();               // 液体玻璃折射（仅 frost 皮肤 + 支持的内核）
   initNavDrop();             // 底栏液态玻璃「水滴」指示器（仅 frost 皮肤）
