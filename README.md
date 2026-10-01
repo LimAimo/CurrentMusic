@@ -2,8 +2,15 @@
 
 基于网易云音乐 SVIP 自建音源自建账号体系的 Android 音乐应用。MDUI 2（Material Design 3）设计语言。
 
-![version](https://img.shields.io/badge/version-1.24.1-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
+![version](https://img.shields.io/badge/version-1.25.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
 
+> **v1.25.0**：**首页收纳——「一键开听」置顶，长列表默认折叠**。
+> · **一键开听**提到首页最上方（问候与公告横幅之下），打开就是"点一下就能听"的四个入口。
+> · **继续播放 / 猜你喜欢**首屏各只显示前 5 条，下方给一条「查看全部（还有 N 首）」；
+>   点开展开、再点收起，按钮文案与箭头同步变化；条目本来就不超过 5 条时按钮不出现（不留死按钮）。
+>   折叠只换一份切片重渲染，播放索引始终是原数组前缀，点第几条就播第几条，不会错位。
+> · 目的是消除首页的视觉混乱：原来最近播放一多就把每日推荐、猜你喜欢全挤到屏幕外，
+>   现在每个模块都保持在"一眼能看完"的高度。
 > **v1.24.1**：**紧急修复——v1.24.0 的首页打不开**（`页面加载失败: bannerHTML is not defined`）。
 > 原因是我给首页改版时用「字符串定位 + 切片替换」动模板，而首页里**两处 `el.innerHTML` 都以同一段
 > 模板开头**，定位命中了骨架屏那处，把中间的数据请求段（`bannerHTML`/`daily`/`recForYou`/`jobs` 等）
