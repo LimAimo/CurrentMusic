@@ -2,8 +2,20 @@
 
 基于网易云音乐 SVIP 自建音源自建账号体系的 Android 音乐应用。MDUI 2（Material Design 3）设计语言。
 
-![version](https://img.shields.io/badge/version-1.27.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
+![version](https://img.shields.io/badge/version-1.28.0-6750A4) ![android](https://img.shields.io/badge/Android-7.0%2B-34A853) ![size](https://img.shields.io/badge/APK-~350KB-4285F4)
 
+> **v1.28.0**：**字体大小改由 App 自己控制（不跟随系统）+ 设置页可调、带实时预览**。
+> · **不跟随系统字体大小**：Android WebView 显式固定 `textZoom=100`（默认值虽为 100，但部分
+>   ROM 的辅助功能/字体设置会把它抬高，写死才可控，`onConfigurationChanged` 里再压一次），
+>   CSS 同时 `text-size-adjust: none` 退出浏览器/WebView 的自动文字缩放。
+>   目标是**同一份设置在谁的手机上都一样大**。
+> · **默认「标准」**，设置页「外观 → 字体大小」可选 小 / 标准 / 大 / 特大，**点一下立即全站生效**。
+> · **调整时有预览**：对话框里给三种典型文字的实时对照——列表行（歌名+歌手）、歌词行、说明正文，
+>   并随所选档位即时变化；预览块自带缩放变量，所以看到的就是生效后的效果。
+> · 实现方式：全站 **273 处字号 + 34 处内联字号**统一改写为 `calc(Npx * var(--cm-fs, 1))`
+>   （原代码全是 px、0 处 rem，改根字号完全无效——这正是以前"没法调字号"的根本原因）。
+>   只放大文字，**行高与间距不变**，所以调大后版面不会被撑乱；歌词字号也乘上同一倍率，
+>   避免"选了特大字体但歌词还是原大小"。
 > **v1.27.0**：**修正「听歌时长」口径——以前那个数根本不是听歌时长**。
 > 旧算法是 `SUM(曲目时长) over plays`，而 `plays` 只在**开始播放**时写一条（且同曲只留最后一条），
 > 所以它只反映「你点开过多少首**不同的**歌」：
